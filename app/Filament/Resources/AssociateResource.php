@@ -16,9 +16,10 @@ use Illuminate\Database\Eloquent\SoftDeletingScope;
 class AssociateResource extends Resource
 {
     protected static ?string $model = Associate::class;
+    protected static ?string $navigationIcon = 'heroicon-o-user-group';
     protected static ?string $navigationLabel = 'Associados';
-
     protected static ?string $pluralModelLabel = 'Associados';
+    protected static ?string $navigationGroup = 'Usuários';
 
     protected static ?string $modelLabel = 'Associado';
 
@@ -28,22 +29,73 @@ class AssociateResource extends Resource
     {
         return $form
             ->schema([
-                Forms\Components\TextInput::make('user_id')
-                    ->required()
-                    ->numeric(),
-                Forms\Components\TextInput::make('member_type_id')
-                    ->required()
-                    ->numeric(),
-                Forms\Components\TextInput::make('position_id')
-                    ->required()
-                    ->numeric(),
-                Forms\Components\TextInput::make('enrollment')
-                    ->required()
-                    ->maxLength(255),
-                Forms\Components\DatePicker::make('association_date')
-                    ->required(),
-                Forms\Components\Toggle::make('is_active')
-                    ->required(),
+                Forms\Components\Grid::make(3) // Dividindo o layout em 2 colunas
+                ->schema([
+                    Forms\Components\Select::make('user_id')
+                        ->label('Usuário')
+                        ->required()
+                        ->relationship('user', 'name')
+                        ->searchable()
+                        ->preload()
+                        ->columnSpan(1)
+                        ->reactive()
+                        ->afterStateUpdated(function ($state, callable $set) {
+                            if ($state) {
+                                $user = \App\Models\User::find($state); // Busca o usuário selecionado
+                                $set('document', $user ? $user->document : ''); // Define o campo 'name' com o nome do usuário
+                            }
+                        })
+                        ,
+
+                    Forms\Components\TextInput::make('document')
+                        ->label('CPF')
+                        ->disabled()
+                        ->required()
+                        ->maxLength(255)
+                        ->columnSpan(2)
+                        ->columnSpan(1),
+
+
+                    Forms\Components\TextInput::make('enrollment')
+                        ->label('Matrícula')
+                        ->required()
+                        ->maxLength(255),
+
+                    Forms\Components\Select::make('associated_type_id')
+                        ->label('Tipo de Membro')
+                        ->relationship('associated_types', 'name')
+                        ->required()
+                        ->preload()
+                        ->searchable(),
+
+                    Forms\Components\Select::make('position_id')
+                        ->label('Cargo')
+                        ->required()
+                        ->relationship('position', 'name'),
+
+                    Forms\Components\DatePicker::make('association_date')
+                        ->label('Data de Associação')
+                        ->required(),
+
+                    Forms\Components\ToggleButtons::make('is_active')
+                        ->label('Associado Ativo?')
+                        ->default(true)
+                        ->inline()
+                        ->options([
+                            '0' => 'Não',
+                            '1' => 'Sim',
+                        ])
+                        ->icons([
+                            '0' => 'heroicon-o-x-mark',
+                            '1' => 'heroicon-o-check',
+                        ])
+                        ->colors([
+                            '0' => 'danger',
+                            '1' => 'success',
+                        ])
+                    ,
+                ])
+
             ]);
     }
 
@@ -51,16 +103,19 @@ class AssociateResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('user_id')
+                Tables\Columns\TextColumn::make('user.name')
+                    ->numeric()
+                    ->label('Nome')
+                    ->sortable(),
+                Tables\Columns\TextColumn::make('associated_types.name')
                     ->numeric()
                     ->sortable(),
-                Tables\Columns\TextColumn::make('member_type_id')
+                Tables\Columns\TextColumn::make('position.name')
                     ->numeric()
-                    ->sortable(),
-                Tables\Columns\TextColumn::make('position_id')
-                    ->numeric()
+                    ->label('Cargo')
                     ->sortable(),
                 Tables\Columns\TextColumn::make('enrollment')
+                    ->label('Matrícula')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('association_date')
                     ->date()
@@ -93,7 +148,7 @@ class AssociateResource extends Resource
     public static function getRelations(): array
     {
         return [
-            //
+            RelationManagers\DependantsRelationManager::class,
         ];
     }
 

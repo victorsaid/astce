@@ -16,6 +16,7 @@ class PositionSeeder extends Seeder
             ['name' => 'Auditor de Controle Externo'],
             ['name' => 'Técnico de Controle Externo'],
             ['name' => 'Auxiliar de Controle Externo'],
+            ['name' => 'Analista de Controle Externo'],
         ];
 
         foreach ($positions as $position) {

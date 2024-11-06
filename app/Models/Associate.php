@@ -12,14 +12,8 @@ class Associate extends Model
         'user_id',
         'phone_id',
         'position_id',
-        'name',
-        'photo',
-        'gender',
-        'birth_date',
-        'blood_type',
-        'marital_status',
-        'document',
-        'education_level',
+        'associated_type_id',
+        'association_date',
         'enrollment',
         'is_active',
     ];
@@ -32,13 +26,18 @@ class Associate extends Model
     {
         return $this->belongsTo(User::class);
     }
-    public function phones()
-    {
-        return $this->hasMany(Phone::class);
-    }
     public function position()
     {
         return $this->belongsTo(Position::class);
+    }
+    public function associated_types()
+    {
+        return $this->belongsTo(AssociatedType::class);
+    }
+
+    public function dependants()
+    {
+        return $this->hasMany(Dependant::class);
     }
 
 }

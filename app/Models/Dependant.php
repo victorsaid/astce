@@ -5,20 +5,19 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Employee extends Model
+class Dependant extends Model
 {
     use HasFactory;
 
     protected $fillable = [
-        'user_id',
+        'associate_id',
         'name',
-        'document',
-        'hire_date',
-        'salary',
+        'birth_date',
+        'relation',
     ];
 
-    public function user()
+    public function associate()
     {
-        return $this->belongsTo(User::class);
+        return $this->belongsTo(Associate::class);
     }
 }

@@ -11,11 +11,12 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('associated_types', function (Blueprint $table) {
+        Schema::create('dependants', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('associate_id')->constrained()->cascadeOnDelete();
             $table->string('name');
-            $table->string('description')->nullable();
-            $table->boolean('abble_vote')->default(true);
+            $table->date('birth_date');
+            $table->string('relation');
             $table->timestamps();
         });
     }
@@ -25,6 +26,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('associated_types');
+        Schema::dropIfExists('dependants');
     }
 };

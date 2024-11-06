@@ -10,8 +10,8 @@ class Phone extends Model
     use HasFactory;
     protected $fillable = ['ddd', 'number', 'type', 'observation'];
 
-    public function associate()
+    public function user()
     {
-        return $this->belongsTo(Associate::class);
+        return $this->belongsTo(User::class);
     }
 }

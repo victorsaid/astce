@@ -5,20 +5,18 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Employee extends Model
+class AssociatedType extends Model
 {
     use HasFactory;
 
     protected $fillable = [
-        'user_id',
         'name',
-        'document',
-        'hire_date',
-        'salary',
+        'description',
+        'abble_vote',
     ];
 
-    public function user()
+    public function associates()
     {
-        return $this->belongsTo(User::class);
+        return $this->hasMany(Associate::class);
     }
 }

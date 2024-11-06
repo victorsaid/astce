@@ -2,9 +2,9 @@
 
 namespace App\Filament\Resources;
 
-use App\Filament\Resources\PositionResource\Pages;
-use App\Filament\Resources\PositionResource\RelationManagers;
-use App\Models\Position;
+use App\Filament\Resources\PermissionResource\Pages;
+use App\Filament\Resources\PermissionResource\RelationManagers;
+use App\Models\Permission;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
@@ -13,14 +13,14 @@ use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 
-class PositionResource extends Resource
+class PermissionResource extends Resource
 {
-    protected static ?string $model = Position::class;
-    protected static ?string $navigationGroup = 'Cadastros auxiliares';
-    protected static ?string $modelLabel = 'Cargo';
-    protected static ?string $pluralModelLabel = 'Cargos';
-    protected static ?string $slug = 'cargos';
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static ?string $model = Permission::class;
+    protected static ?string $navigationGroup = 'Permissões e Papéis';
+    protected static ?string $navigationIcon = 'heroicon-o-key';
+    protected static ?string $modelLabel = 'Permissões';
+    protected static ?string $pluralModelLabel = 'Permissões';
+    protected static ?string $navigationLabel = 'Permissões';
 
     public static function form(Form $form): Form
     {
@@ -29,6 +29,13 @@ class PositionResource extends Resource
                 Forms\Components\TextInput::make('name')
                     ->required()
                     ->maxLength(255),
+                Forms\Components\Hidden::make('guard_name')
+                    ->required()
+                    ->default('web'),
+                Forms\Components\Select::make('roles')
+                    ->relationship('roles', 'name')
+                    ->multiple()
+                    ->preload(),
             ]);
     }
 
@@ -37,8 +44,9 @@ class PositionResource extends Resource
         return $table
             ->columns([
                 Tables\Columns\TextColumn::make('name')
-                    ->label('Cargo')
-                    ->searchable(),
+                    ->searchable()
+                    ->sortable(),
+                Tables\Columns\TextColumn::make('guard_name'),
                 Tables\Columns\TextColumn::make('created_at')
                     ->dateTime()
                     ->sortable()
@@ -52,8 +60,8 @@ class PositionResource extends Resource
                 //
             ])
             ->actions([
-                Tables\Actions\ViewAction::make(),
                 Tables\Actions\EditAction::make(),
+                Tables\Actions\DeleteAction::make(),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
@@ -62,20 +70,10 @@ class PositionResource extends Resource
             ]);
     }
 
-    public static function getRelations(): array
-    {
-        return [
-            //
-        ];
-    }
-
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListPositions::route('/'),
-            'create' => Pages\CreatePosition::route('/create'),
-            'view' => Pages\ViewPosition::route('/{record}'),
-            'edit' => Pages\EditPosition::route('/{record}/edit'),
+            'index' => Pages\ManagePermissions::route('/'),
         ];
     }
 }
