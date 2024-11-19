@@ -251,7 +251,7 @@ class UserResource extends Resource
                                             ]),
                                         ]), //fecha step 4
                                 ])->startOnStep(4), //fecha wizard
-                        ]), //fechar tab menor
+                        ]), //fecha tab de usuario
                         Tabs\Tab::make('Funcionário')
                             ->schema([
                                 Forms\Components\Group::make([

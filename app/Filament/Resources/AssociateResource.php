@@ -39,23 +39,13 @@ class AssociateResource extends Resource
                         ->preload()
                         ->columnSpan(1)
                         ->reactive()
-                        ->afterStateUpdated(function ($state, callable $set) {
-                            if ($state) {
-                                $user = \App\Models\User::find($state); // Busca o usuário selecionado
-                                $set('document', $user ? $user->document : ''); // Define o campo 'name' com o nome do usuário
-                            }
-                        })
-                        ,
-
-                    Forms\Components\TextInput::make('document')
-                        ->label('CPF')
-                        ->disabled()
-                        ->required()
-                        ->maxLength(255)
-                        ->columnSpan(2)
-                        ->columnSpan(1),
-
-
+//                        ->afterStateUpdated(function ($state, callable $set) {
+//                            if ($state) {
+//                                $user = \App\Models\User::find($state); // Busca o usuário selecionado
+//                                $set('document', $user ? $user->document : ''); // Define o campo 'name' com o nome do usuário
+//                            }
+//                        })
+                    ,
                     Forms\Components\TextInput::make('enrollment')
                         ->label('Matrícula')
                         ->required()
@@ -63,7 +53,7 @@ class AssociateResource extends Resource
 
                     Forms\Components\Select::make('associated_type_id')
                         ->label('Tipo de Membro')
-                        ->relationship('associated_types', 'name')
+                        ->relationship('associated_type', 'name')
                         ->required()
                         ->preload()
                         ->searchable(),

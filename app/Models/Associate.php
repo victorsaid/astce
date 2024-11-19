@@ -30,7 +30,7 @@ class Associate extends Model
     {
         return $this->belongsTo(Position::class);
     }
-    public function associated_types()
+    public function associated_type()
     {
         return $this->belongsTo(AssociatedType::class);
     }
