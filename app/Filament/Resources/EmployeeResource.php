@@ -66,6 +66,7 @@ class EmployeeResource extends Resource
         return $table
             ->columns([
                 Tables\Columns\TextColumn::make('user.name')
+                    ->label('Nome')
                     ->numeric()
                     ->sortable(),
                 Tables\Columns\TextColumn::make('hire_date')
@@ -73,7 +74,7 @@ class EmployeeResource extends Resource
                     ->sortable()
                     ->label('Data de Contratação'),
                 Tables\Columns\TextColumn::make('salary')
-                    ->numeric()
+                    ->money('BRL', '10')
                     ->sortable()
                     ->label('Salário'),
                 Tables\Columns\IconColumn::make('is_active')

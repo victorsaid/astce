@@ -37,254 +37,215 @@ class UserResource extends Resource
             ->schema([
                 Forms\Components\Grid::make(1) //grid maior
                 ->schema([
-
-                    Forms\Components\Tabs::make('usuario')
-                    ->schema([
-                        Tabs\Tab::make('usuario')
-                        ->schema([
-                                Forms\Components\Wizard::make([
-                                    // Passo 1: Informações Pessoais
-                                    Wizard\Step::make('Informações Pessoais')
-                                        ->schema([
-                                            Forms\Components\Grid::make(3) // Dividindo em 2 colunas para melhorar layout
-                                            ->schema([
-                                                Forms\Components\FileUpload::make('photo')
-                                                    ->label('Foto')
-                                                    ->imageEditor()
-                                                    ->avatar()
-                                                    ->directory('profile_photos')
-                                                    ->preserveFilenames()
-                                                    ->disk('public'),
-                                                Forms\Components\TextInput::make('name')
-                                                    ->label('Nome Completo')
-                                                    ->required()
-                                                    ->maxLength(255),
-
-                                                Forms\Components\TextInput::make('document')
-                                                    ->label('CPF')
-                                                    ->placeholder('000.000.000-00')
-                                                    ->required()
-                                                    ->mask('999.999.999-99')
-                                                    ->unique(User::class, 'document', ignoreRecord: true)
-                                                    ,
-
-                                                Forms\Components\Select::make('gender')
-                                                    ->label('Gênero')
-                                                    ->required()
-                                                    ->options([
-                                                        'M' => 'Masculino',
-                                                        'F' => 'Feminino',
-                                                    ]),
-
-                                                Forms\Components\DatePicker::make('birth_date')
-                                                    ->label('Data de Nascimento')
-                                                    ->required(),
-
-                                                Forms\Components\Select::make('blood_type')
-                                                    ->label('Tipo Sanguíneo')
-                                                    ->options([
-                                                        'A+' => 'A+',
-                                                        'A-' => 'A-',
-                                                        'B+' => 'B+',
-                                                        'B-' => 'B-',
-                                                        'AB+' => 'AB+',
-                                                        'AB-' => 'AB-',
-                                                        'O+' => 'O+',
-                                                        'O-' => 'O-',
-                                                    ]),
-                                                Forms\Components\Select::make('marital_status')
-                                                    ->label('Estado Civil')
-                                                    ->required()
-                                                    ->options([
-                                                        'solteiro' => 'Solteiro(a)',
-                                                        'casado' => 'Casado(a)',
-                                                        'divorciado' => 'Divorciado(a)',
-                                                        'viuvo' => 'Viúvo(a)',
-                                                    ]),
-
-                                                Forms\Components\Select::make('education_level')
-                                                    ->required()
-                                                    ->label('Nível de Escolaridade')
-                                                    ->options([
-                                                        'fundamental' => 'Fundamental',
-                                                        'medio' => 'Médio',
-                                                        'superior' => 'Superior',
-                                                        'pos' => 'Pós-Graduação',
-                                                        'mestrado' => 'Mestrado',
-                                                        'doutorado' => 'Doutorado'
-                                                    ]),
-                                            ]),
-                                        ]), // Step 1
-                                    Wizard\Step::make('Contatos')
-                                        ->schema([
-                                            Forms\Components\Repeater::make('contacts')
-                                                ->label('Contatos')
-                                                ->relationship('phone')
-                                                ->schema([
-                                                    Forms\Components\Grid::make(4)->schema([ // Organizando em 4 colunas
-                                                        Forms\Components\TextInput::make('ddd')
-                                                            ->label('DDD')
-                                                            ->required()
-                                                            ->mask('99')
-                                                            ->maxLength(2),
-                                                        Forms\Components\TextInput::make('number')
-                                                            ->label('Telefone')
-                                                            ->required()
-                                                            ->mask('99999-9999'),
-                                                        Forms\Components\Select::make('type')
-                                                            ->label('Tipo de contato')
-                                                            ->required()
-                                                            ->options([
-                                                                'Celular' => 'Celular',
-                                                                'Residencial' => 'Residencial',
-                                                                'Comercial' => 'Comercial',
-                                                            ]),
-                                                        Forms\Components\TextInput::make('observation')
-                                                            ->label('Observação')
-                                                            ->maxLength(255),
-                                                    ]),
-                                                ])
-                                                ->columns(1) // Define uma repetição por linha
-
-                                        ]),
-                                    // Passo 2: Informações de endereço
-                                    Wizard\Step::make('Endereço')
-                                        ->schema([
-                                            Forms\Components\Grid::make() // Organizando o layout em duas colunas
-                                            ->schema([
-                                                Forms\Components\Fieldset::make('Endereço')
-                                                    ->relationship('address', 'address')
-                                                ->schema([
-                                                    Forms\Components\TextInput::make('zip_code')
-                                                        ->label('CEP')
-                                                        ->suffixAction(
-                                                            fn ($state, $set) =>
-                                                            Action::make('search-action')
-                                                                ->icon('heroicon-o-magnifying-glass')
-                                                                ->action(function () use ($state, $set) {
-                                                                    if (blank($state || strlen($state) < 9)) {
-                                                                        Notification::make()
-                                                                            ->title('Digite o CEP completo para buscar o endereço')
-                                                                            ->danger()
-                                                                            ->send();
-                                                                        return;
-                                                                    }
-
-                                                                    try {
-                                                                        $cepData = Http::withoutVerifying() // Desabilita a verificação do SSL
-                                                                        ->get("https://viacep.com.br/ws/{$state}/json/")
-                                                                            ->throw()
-                                                                            ->json();
-                                                                    } catch (\Exception $e) {
-                                                                        Notification::make()
-                                                                            ->title('Erro ao buscar o CEP. Verifique se o CEP está correto e tente novamente.')
-                                                                            ->danger()
-                                                                            ->send();
-                                                                        return;
-                                                                    }
-
-                                                                    $set('neighborhood', $cepData['bairro'] ?? null);
-                                                                    $set('street', $cepData['logradouro'] ?? null);
-                                                                    $set('city', $cepData['localidade'] ?? null); // Correção: cidade é 'localidade'
-                                                                    $set('state', $cepData['uf'] ?? null); // Correção: estado é 'uf'
-                                                                })
-                                                        )
-                                                        ->mask('99999-999'),
-                                                    Forms\Components\TextInput::make('state')
-                                                        ->label('Estado')
-                                                        ->required()
-                                                        ->maxLength(255),
-                                                    Forms\Components\TextInput::make('city')
-                                                        ->label('Cidade')
-                                                        ->required()
-                                                        ->maxLength(255),
-                                                    Forms\Components\TextInput::make('neighborhood')
-                                                        ->label('bairro')
-                                                        ->required()
-                                                        ->maxLength(255),
-                                                    Forms\Components\TextInput::make('street')
-                                                        ->label('Rua')
-                                                        ->required()
-                                                        ->maxLength(255),
-                                                    Forms\Components\TextInput::make('number')
-                                                        ->label('Número')
-                                                        ->required()
-                                                        ->maxLength(255),
-                                                    Forms\Components\TextInput::make('complement')
-                                                        ->label('Complemento')
-                                                        ->maxLength(255),
-                                                ])
-                                            ])
-                                        ]),
-
-                                    // Passo 4: Informações de Acesso
-                                    Wizard\Step::make('Informações de Acesso')
-                                        ->schema([
-                                            Forms\Components\Grid::make() // Organizando o layout em duas colunas
-                                            ->schema([
-                                                Forms\Components\TextInput::make('email')
-                                                    ->label('Email')
-                                                    ->email()
-                                                    ->unique(User::class, 'email', ignoreRecord: true)
-                                                    ->required()
-                                                    ->maxLength(255),
-
-                                                Forms\Components\DateTimePicker::make('email_verified_at')
-                                                    ->label('Email Verificado Em'),
-
-                                                Forms\Components\TextInput::make('password')
-                                                    ->label('Senha')
-                                                    ->password()
-                                                    ->maxLength(255)
-                                                    ->dehydrateStateUsing(fn($state) => filled($state) ? bcrypt($state) : null) // Apenas criptografa se o campo estiver preenchido
-                                                    ->required(fn(Page $livewire) => $livewire instanceof Pages\CreateUser) // Senha obrigatória apenas na criação
-                                                    ->dehydrated(fn($state) => filled($state)), // Evita que o campo seja enviado se estiver vazio
-                                                Forms\Components\Select::make('role')
-                                                    ->label('Perfil')
-                                                    ->relationship('roles', 'name',
-                                                        fn(Builder $query)=> auth()->user()->hasRole(['Admin', 'Super_admin']) ? null :
-                                                            $query->whereNotIn('name', ['Admin', 'Super_admin'])
-                                                    )
-                                                    ->required()
-                                                    ->preload()
-                                                    ->multiple(),
-                                            ]),
-                                        ]), //fecha step 4
-                                ])->startOnStep(4), //fecha wizard
-                        ]), //fecha tab de usuario
-                        Tabs\Tab::make('Funcionário')
+                    Forms\Components\Wizard::make([
+                        // Passo 1: Informações Pessoais
+                        Wizard\Step::make('Informações Pessoais')
                             ->schema([
-                                Forms\Components\Group::make([
-                                    //Forms\Components\TextInput::make('user.name'),
-                                    Forms\Components\TextInput::make('salary')
+                                Forms\Components\Grid::make(3) // Dividindo em 2 colunas para melhorar layout
+                                ->schema([
+                                    Forms\Components\FileUpload::make('photo')
+                                        ->label('Foto')
+                                        ->imageEditor()
+                                        ->avatar()
+                                        ->directory('profile_photos')
+                                        ->preserveFilenames()
+                                        ->disk('public'),
+                                    Forms\Components\TextInput::make('name')
+                                        ->label('Nome Completo')
                                         ->required()
-                                        ->label('Salário')
-                                        ->numeric()
-                                        ->prefix('R$'),
-                                    Forms\Components\DatePicker::make('hire_date')
-                                        ->label('Data de Contratação')
-                                        ->required(),
-                                    Forms\Components\ToggleButtons::make('is_active')
-                                        ->label('Funcionário Ativo?')
-                                        ->default(true)
-                                        ->inline()
+                                        ->maxLength(255),
+
+                                    Forms\Components\TextInput::make('document')
+                                        ->label('CPF')
+                                        ->placeholder('000.000.000-00')
+                                        ->required()
+                                        ->mask('999.999.999-99')
+                                        ->unique(User::class, 'document', ignoreRecord: true)
+                                    ,
+
+                                    Forms\Components\Select::make('gender')
+                                        ->label('Gênero')
+                                        ->required()
                                         ->options([
-                                            '0' => 'Não',
-                                            '1' => 'Sim',
-                                        ])
-                                        ->icons([
-                                            '0' => 'heroicon-o-x-mark',
-                                            '1' => 'heroicon-o-check',
-                                        ])
-                                        ->colors([
-                                            '0' => 'danger',
-                                            '1' => 'success',
+                                            'M' => 'Masculino',
+                                            'F' => 'Feminino',
                                         ]),
-                                ])->relationship('employee'),//fecha grupo
 
-                            ]),//fecha tab de funcionario
+                                    Forms\Components\DatePicker::make('birth_date')
+                                        ->label('Data de Nascimento')
+                                        ->required(),
 
-                    ]), // fecha tab maior
+                                    Forms\Components\Select::make('blood_type')
+                                        ->label('Tipo Sanguíneo')
+                                        ->options([
+                                            'A+' => 'A+',
+                                            'A-' => 'A-',
+                                            'B+' => 'B+',
+                                            'B-' => 'B-',
+                                            'AB+' => 'AB+',
+                                            'AB-' => 'AB-',
+                                            'O+' => 'O+',
+                                            'O-' => 'O-',
+                                        ]),
+                                    Forms\Components\Select::make('marital_status')
+                                        ->label('Estado Civil')
+                                        ->required()
+                                        ->options([
+                                            'solteiro' => 'Solteiro(a)',
+                                            'casado' => 'Casado(a)',
+                                            'divorciado' => 'Divorciado(a)',
+                                            'viuvo' => 'Viúvo(a)',
+                                        ]),
+
+                                    Forms\Components\Select::make('education_level')
+                                        ->required()
+                                        ->label('Nível de Escolaridade')
+                                        ->options([
+                                            'fundamental' => 'Fundamental',
+                                            'medio' => 'Médio',
+                                            'superior' => 'Superior',
+                                            'pos' => 'Pós-Graduação',
+                                            'mestrado' => 'Mestrado',
+                                            'doutorado' => 'Doutorado'
+                                        ]),
+                                ]),
+                            ]), // Step 1
+                        Wizard\Step::make('Contatos')
+                            ->schema([
+                                Forms\Components\Repeater::make('contacts')
+                                    ->label('Contatos')
+                                    ->relationship('phone')
+                                    ->schema([
+                                        Forms\Components\Grid::make(4)->schema([ // Organizando em 4 colunas
+                                            Forms\Components\TextInput::make('ddd')
+                                                ->label('DDD')
+                                                ->required()
+                                                ->mask('99')
+                                                ->maxLength(2),
+                                            Forms\Components\TextInput::make('number')
+                                                ->label('Telefone')
+                                                ->required()
+                                                ->mask('99999-9999'),
+                                            Forms\Components\Select::make('type')
+                                                ->label('Tipo de contato')
+                                                ->required()
+                                                ->options([
+                                                    'Celular' => 'Celular',
+                                                    'Residencial' => 'Residencial',
+                                                    'Comercial' => 'Comercial',
+                                                ]),
+                                            Forms\Components\TextInput::make('observation')
+                                                ->label('Observação')
+                                                ->maxLength(255),
+                                        ]),
+                                    ])
+                                    ->columns(1) // Define uma repetição por linha
+
+                            ]),
+                        // Passo 2: Informações de endereço
+                        Wizard\Step::make('Endereço')
+                            ->schema([
+                                Forms\Components\Grid::make() // Organizando o layout em duas colunas
+                                ->schema([
+                                    Forms\Components\Fieldset::make('Endereço')
+                                        ->relationship('address', 'address')
+                                        ->schema([
+                                            Forms\Components\TextInput::make('zip_code')
+                                                ->label('CEP')
+                                                ->suffixAction(
+                                                    fn($state, $set) => Action::make('search-action')
+                                                        ->icon('heroicon-o-magnifying-glass')
+                                                        ->action(function () use ($state, $set) {
+                                                            if (blank($state || strlen($state) < 9)) {
+                                                                Notification::make()
+                                                                    ->title('Digite o CEP completo para buscar o endereço')
+                                                                    ->danger()
+                                                                    ->send();
+                                                                return;
+                                                            }
+
+                                                            try {
+                                                                $cepData = Http::withoutVerifying() // Desabilita a verificação do SSL
+                                                                ->get("https://viacep.com.br/ws/{$state}/json/")
+                                                                    ->throw()
+                                                                    ->json();
+                                                            } catch (\Exception $e) {
+                                                                Notification::make()
+                                                                    ->title('Erro ao buscar o CEP. Verifique se o CEP está correto e tente novamente.')
+                                                                    ->danger()
+                                                                    ->send();
+                                                                return;
+                                                            }
+
+                                                            $set('neighborhood', $cepData['bairro'] ?? null);
+                                                            $set('street', $cepData['logradouro'] ?? null);
+                                                            $set('city', $cepData['localidade'] ?? null); // Correção: cidade é 'localidade'
+                                                            $set('state', $cepData['uf'] ?? null); // Correção: estado é 'uf'
+                                                        })
+                                                )
+                                                ->mask('99999-999'),
+                                            Forms\Components\TextInput::make('state')
+                                                ->label('Estado')
+                                                ->required()
+                                                ->maxLength(255),
+                                            Forms\Components\TextInput::make('city')
+                                                ->label('Cidade')
+                                                ->required()
+                                                ->maxLength(255),
+                                            Forms\Components\TextInput::make('neighborhood')
+                                                ->label('bairro')
+                                                ->required()
+                                                ->maxLength(255),
+                                            Forms\Components\TextInput::make('street')
+                                                ->label('Rua')
+                                                ->required()
+                                                ->maxLength(255),
+                                            Forms\Components\TextInput::make('number')
+                                                ->label('Número')
+                                                ->required()
+                                                ->maxLength(255),
+                                            Forms\Components\TextInput::make('complement')
+                                                ->label('Complemento')
+                                                ->maxLength(255),
+                                        ])
+                                ])
+                            ]),
+
+                        // Passo 4: Informações de Acesso
+                        Wizard\Step::make('Informações de Acesso')
+                            ->schema([
+                                Forms\Components\Grid::make() // Organizando o layout em duas colunas
+                                ->schema([
+                                    Forms\Components\TextInput::make('email')
+                                        ->label('Email')
+                                        ->email()
+                                        ->unique(User::class, 'email', ignoreRecord: true)
+                                        ->required()
+                                        ->maxLength(255),
+
+                                    Forms\Components\DateTimePicker::make('email_verified_at')
+                                        ->label('Email Verificado Em'),
+
+                                    Forms\Components\TextInput::make('password')
+                                        ->label('Senha')
+                                        ->password()
+                                        ->maxLength(255)
+                                        ->dehydrateStateUsing(fn($state) => filled($state) ? bcrypt($state) : null) // Apenas criptografa se o campo estiver preenchido
+                                        ->required(fn(Page $livewire) => $livewire instanceof Pages\CreateUser) // Senha obrigatória apenas na criação
+                                        ->dehydrated(fn($state) => filled($state)), // Evita que o campo seja enviado se estiver vazio
+                                    Forms\Components\Select::make('role')
+                                        ->label('Perfil')
+                                        ->relationship('roles', 'name',
+                                            fn(Builder $query) => auth()->user()->hasRole(['Admin', 'Super_admin']) ? null :
+                                                $query->whereNotIn('name', ['Admin', 'Super_admin'])
+                                        )
+                                        ->required()
+                                        ->preload()
+                                        ->multiple(),
+                                ]),
+                            ]), //fecha step 4
+                    ])->startOnStep(4), //fecha wizard
+
                 ]),
             ]); //fecha schema do form
     }
