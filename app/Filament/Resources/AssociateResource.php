@@ -38,6 +38,7 @@ class AssociateResource extends Resource
                         ->searchable()
                         ->preload()
                         ->columnSpan(1)
+                        ->disabled(fn ($livewire) => $livewire instanceof \Filament\Resources\Pages\EditRecord)
                         ->reactive()
 //                        ->afterStateUpdated(function ($state, callable $set) {
 //                            if ($state) {

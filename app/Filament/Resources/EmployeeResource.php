@@ -31,14 +31,14 @@ class EmployeeResource extends Resource
                     ->required()
                     ->relationship('user', 'name')
                     ->searchable()
-                    ->preload(),
+                    ->preload()
+                    ->disabled(fn ($livewire) => $livewire instanceof \Filament\Resources\Pages\EditRecord),
                 Forms\Components\DatePicker::make('hire_date')
                     ->label('Data de Contratação')
                     ->required(),
                 Forms\Components\TextInput::make('salary')
                     ->required()
                     ->label('Salário')
-                    ->numeric()
                     ->prefix('R$')
                 ,
                 Forms\Components\ToggleButtons::make('is_active')
@@ -68,7 +68,8 @@ class EmployeeResource extends Resource
                 Tables\Columns\TextColumn::make('user.name')
                     ->label('Nome')
                     ->numeric()
-                    ->sortable(),
+                    ->sortable()
+                    ->searchable(),
                 Tables\Columns\TextColumn::make('hire_date')
                     ->date('d/m/Y')
                     ->sortable()

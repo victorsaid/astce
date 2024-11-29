@@ -244,7 +244,7 @@ class UserResource extends Resource
                                         ->multiple(),
                                 ]),
                             ]), //fecha step 4
-                    ])->startOnStep(4), //fecha wizard
+                    ]), //fecha wizard
 
                 ]),
             ]); //fecha schema do form
@@ -272,6 +272,11 @@ class UserResource extends Resource
                     ->label('Data de Nascimento')
                     ->date('d/m/Y')
                     ->sortable(),
+                Tables\Columns\TextColumn::make('phone.number')
+                    ->label('Telefone')
+                    ->searchable()
+                    ->formatStateUsing(fn ($state, $record) => "({$record->phone->ddd}) {$state}")
+                    ->copyable(),
                 Tables\Columns\TextColumn::make('blood_type')
                     ->searchable()
                     ->toggleable(isToggledHiddenByDefault: true),

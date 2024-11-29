@@ -34,10 +34,6 @@ class ListAssociates extends ListRecords
                 ->label('Inativos')
                 ->badge(Associate::query()->where('is_active', false)->count())
                 ->modifyQueryUsing(fn (Builder $query) => $query->where('gender', 'F')),
-            Tab::make('Employees')
-                ->label('Funcionários')
-                ->badge(Employee::query()->count())
-                ->modifyQueryUsing(fn (Builder $query) => $query->where instanceof Employee),
         ];
     }
 }
