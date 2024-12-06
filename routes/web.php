@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 /*
 |--------------------------------------------------------------------------
@@ -16,3 +17,6 @@ use Illuminate\Support\Facades\Route;
 Route::get('/', function () {
     return view('welcome');
 });
+
+Route::get('/pdf/meetings/{user}', [\App\Http\Controllers\PdfController::class, 'pdfMeetings'])->name('pdf.example');
+Route::get('/pdf/meeting/{meeting}', [\App\Http\Controllers\PdfController::class, 'exportMeetingPdf'])->name('pdf.export');

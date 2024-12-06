@@ -5,6 +5,7 @@ namespace App\Filament\Resources;
 use App\Filament\Resources\MeetingResource\Pages;
 use App\Filament\Resources\MeetingResource\RelationManagers;
 use App\Models\Meeting;
+use Filament\Actions\Action;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
@@ -12,6 +13,7 @@ use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Illuminate\Support\Facades\Auth;
 
 class MeetingResource extends Resource
 {
@@ -60,6 +62,15 @@ class MeetingResource extends Resource
                             ->maxLength(65535)
                             ->columnSpanFull(),
                     ])->columnSpanFull(),
+
+                Forms\Components\FileUpload::make('attachments')
+                    ->label('Anexos')
+                    ->maxFiles(5)
+                    ->columnSpan(1),
+                Forms\Components\FileUpload::make('photos')
+                    ->label('Fotos')
+                    ->maxFiles(5)
+                    ->columnSpan(1),
             ]);
     }
 
