@@ -13,7 +13,7 @@ class Meeting extends Model
         'title',
         'description',
         'date',
-        'participants',
+        //'participants',
         'attachments',
         'photos',
 
@@ -21,7 +21,7 @@ class Meeting extends Model
 
     protected $casts = [
         //'date' => 'datetime',
-        'participants' => 'array',
+        //'participants' => 'array',
         'attachments' => 'array',
         'photos' => 'array',
     ];
@@ -29,5 +29,9 @@ class Meeting extends Model
     public function topics()
     {
         return $this->hasMany(Topic::class);
+    }
+    public function participants()
+    {
+        return $this->belongsToMany(User::class, 'meeting_user', 'meeting_id', 'user_id');
     }
 }

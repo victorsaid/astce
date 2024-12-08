@@ -23,16 +23,20 @@
 {{--    </style>--}}
 </head>
 <body>
-<img src="{{ asset('storage/logo/Logoastce.png') }}" style="width: 150px; height: auto; margin-bottom: 20px;" alt="Logo">
+<div style="text-align: center; margin-bottom: 20px;">
+    <img src="{{ base_path('public/storage/logo/Logoastce.png') }}"
+         style="width: 150px; height: auto;"
+         alt="Logo">
+</div>
 
-<h2 style="text-align: center; font-size: 24px; font-weight: bold; margin-bottom: 20px;">Ata de Reunião</h2>
-<h2 style="font-size: 20px; color: #333; text-transform: uppercase; margin-bottom: 15px;">{{ $meeting->title }}</h2>
+<h2 style="text-align: center; font-size: 24px; font-weight: bold; margin-bottom: 0px;">Ata de Reunião</h2>
+<h3 style="font-size: 20px; color: #000000; text-transform: uppercase; margin-bottom: 15px;">{{ $meeting->title }}</h3>
 
-<div style="margin-bottom: 20px; font-size: 16px; color: #555;">
+<div style="margin-bottom: 0px; font-size: 16px; color: #000000;">
     <p style="margin: 0; line-height: 1.6;"><strong>Data e Hora:</strong> {{ \Carbon\Carbon::parse($meeting->date)->format('d/m/Y H:i') }}</p>
 </div>
 
-<div style="margin-bottom: 20px; font-size: 16px; color: #555;">
+<div style="margin-bottom: 20px; font-size: 16px; color: #000000;">
     <p style="margin: 0; line-height: 1.6; text-align: justify;">
         <strong>Descrição:</strong> {{ $meeting->description }}
     </p>
@@ -40,14 +44,12 @@
 
 
 @if ($meeting->participants)
-    <div class="section">
-        <p><strong>Participantes:</strong></p>
-        <ul>
-            @foreach ($meeting->participants as $participant)
-                <li>{{ $participant }}</li>
-            @endforeach
-        </ul>
-    </div>
+    <h4 style="margin-top: 20px;">Participantes:</h4>
+    <ul>
+        @foreach ($meeting->participants as $participant)
+            <li>{{ $participant->name }}</li>
+        @endforeach
+    </ul>
 @endif
 
 @if ($meeting->topics->isNotEmpty())

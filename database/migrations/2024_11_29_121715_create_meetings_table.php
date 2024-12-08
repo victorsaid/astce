@@ -16,11 +16,18 @@ return new class extends Migration
             $table->string('title');
             $table->text('description')->nullable();
             $table->dateTime('date');
-            $table->json('participants')->nullable();
+            //$table->json('participants')->nullable();
             $table->json('attachments')->nullable();
             $table->json('photos')->nullable();
 
 
+            $table->timestamps();
+        });
+
+        Schema::create('meeting_user', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('meeting_id')->constrained()->onDelete('cascade');
+            $table->foreignId('user_id')->constrained()->onDelete('cascade');
             $table->timestamps();
         });
     }
@@ -31,5 +38,6 @@ return new class extends Migration
     public function down(): void
     {
         Schema::dropIfExists('meetings');
+        Schema::dropIfExists('meeting_user');
     }
 };

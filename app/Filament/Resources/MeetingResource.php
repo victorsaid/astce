@@ -38,6 +38,10 @@ class MeetingResource extends Resource
                 Forms\Components\Textarea::make('description')
                     ->maxLength(65535)
                     ->columnSpanFull(),
+                Forms\Components\Select::make('participants')
+                    ->multiple()
+                    ->relationship('participants', 'name')
+                    ->preload(),
 
 //                Forms\Components\Select::make('participants')
 //                ->multiple()

@@ -22,12 +22,12 @@ class PdfController extends Controller
     public function exportMeetingPdf(Meeting $meeting)
     {
         // Carrega os tópicos relacionados
-        $meeting->load('topics'); // Certifique-se de que a relação 'topics' está configurada no modelo Meeting
+        $meeting->load('topics', 'participants'); // Certifique-se de que a relação 'topics' está configurada no modelo Meeting
 
         // Renderiza o PDF
         $pdf = Pdf::loadView('pdf.meeting', ['meeting' => $meeting]);
 
         // Retorna o PDF para download
-        return $pdf->download("reuniao_{$meeting->id}.pdf");
+        return $pdf->stream("reuniao_{$meeting->id}.pdf");
     }
 }

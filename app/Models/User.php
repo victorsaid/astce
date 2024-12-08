@@ -72,6 +72,11 @@ class User extends Authenticatable implements FilamentUser
         return $this->hasOne(Phone::class);
     }
 
+    public function meetings()
+    {
+        return $this->belongsToMany(Meeting::class, 'meeting_user', 'user_id', 'meeting_id');
+    }
+
 
     public function canAccessPanel(Panel $panel): bool
     {
