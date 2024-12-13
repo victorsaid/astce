@@ -21,6 +21,11 @@ use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Illuminate\Http\Client\RequestException;
 use Illuminate\Support\Facades\Http;
 use Filament\Forms\Components\Tabs;
+use Filament\Forms\Components\Textarea;
+use Filament\Forms\Components\TextInput;
+use Illuminate\Support\Facades\Mail;
+use App\Mail\UserMessageMail;
+use Illuminate\Database\Eloquent\Collection;
 
 class UserResource extends Resource
 {
@@ -309,9 +314,61 @@ class UserResource extends Resource
             ->actions([
                 Tables\Actions\ViewAction::make(),
                 Tables\Actions\EditAction::make(),
+                Tables\Actions\Action::make('sendEmail')
+                    ->label('Enviar E-mail')
+                    ->icon('heroicon-o-envelope')
+                    ->form([
+                        TextInput::make('subject')
+                            ->label('Assunto')
+                            ->required()
+                            ->maxLength(255),
+                        Textarea::make('message')
+                            ->label('Mensagem')
+                            ->required()
+                            ->rows(5),
+                    ])
+                    ->action(function (array $data, $record): void {
+                        // Envia o e-mail para o registro atual
+                        Mail::to($record->email)->send(new UserMessageMail($data['subject'], $data['message']));
+
+                        // Notificação de sucesso
+                        Notification::make()
+                            ->title('E-mail enviado com sucesso!')
+                            ->success()
+                            ->send();
+                    })
+                    ->requiresConfirmation(),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
+                    Tables\Actions\BulkAction::make('sendBulkEmail')
+                        ->label('Enviar E-mails')
+                        ->icon('heroicon-o-envelope')
+                        ->deselectRecordsAfterCompletion()
+                        ->form([
+                            Forms\Components\Textarea::make('message')
+                                ->label('Mensagem')
+                                ->required()
+                                ->rows(3),
+                            Forms\Components\Textarea::make('remarks')
+                                ->label('Observações')
+                                ->hint('As observações não serão enviadas no e-mail.'),
+                        ])
+                        ->action(function (array $data, Collection $records): void { // Use Collection aqui
+                            // Itera sobre os registros selecionados
+                            foreach ($records as $record) {
+                                Mail::to($record->email)->send(
+                                    new \App\Mail\UserMessageMail('Mensagem em Massa', $data['message'])
+                                );
+                            }
+
+                            // Notificação de sucesso
+                            Notification::make()
+                                ->title('E-mails enviados com sucesso!')
+                                ->success()
+                                ->send();
+                        })
+                        ->requiresConfirmation(),
                     Tables\Actions\DeleteBulkAction::make(),
                 ]),
             ]);
@@ -340,4 +397,6 @@ class UserResource extends Resource
             parent::getEloquentQuery() :
             parent::getEloquentQuery()->whereHas('roles', fn($query) => $query->whereNotIn('name', ['Admin', 'Super_admin']));
     }
+
+
 }
