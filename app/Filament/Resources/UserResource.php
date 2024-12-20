@@ -121,16 +121,18 @@ class UserResource extends Resource
                                     ->label('Contatos')
                                     ->relationship('phone')
                                     ->schema([
-                                        Forms\Components\Grid::make(4)->schema([ // Organizando em 4 colunas
-                                            Forms\Components\TextInput::make('ddd')
-                                                ->label('DDD')
-                                                ->required()
-                                                ->mask('99')
-                                                ->maxLength(2),
+                                        Forms\Components\Grid::make(3)->schema([ // Organizando em 4 colunas
+//                                            Forms\Components\TextInput::make('ddd')
+//                                                ->label('DDD')
+//                                                ->required()
+//                                                ->mask('99')
+//                                                ->maxLength(2),
                                             Forms\Components\TextInput::make('number')
                                                 ->label('Telefone')
                                                 ->required()
-                                                ->mask('99999-9999'),
+                                                ->placeholder('(xx)xxxxx-xxxx')
+                                                ->mask('(99)99999-9999')
+                                                ->dehydrateStateUsing(fn($state) => preg_replace('/[^0-9]/', '', $state)), // Remove caracteres não numéricos
                                             Forms\Components\Select::make('type')
                                                 ->label('Tipo de contato')
                                                 ->required()
@@ -278,18 +280,41 @@ class UserResource extends Resource
                     ->date('d/m/Y')
                     ->sortable(),
                 Tables\Columns\TextColumn::make('phone.number')
+                    ->icon('heroicon-o-phone') // Ícone do Heroicons
+                    ->color('success') // Cor opcional para destacar o ícone
                     ->label('Telefone')
                     ->searchable()
-                    ->formatStateUsing(fn ($state, $record) => "({$record->phone->ddd}) {$state}")
-                    ->copyable(),
+                    ->formatStateUsing(fn ($state) =>
+                    preg_replace('/^(\d{2})(\d{4,5})(\d{4})$/', '($1) $2-$3', $state))
+                    ->url(fn ($record) => $record->phone
+                        ? 'https://api.whatsapp.com/send/?phone=55' . preg_replace('/[^0-9]/', '', $record->phone->number)
+                        : null
+                    )
+                    ->openUrlInNewTab(),
                 Tables\Columns\TextColumn::make('blood_type')
+                    ->label('Tipo Sanguíneo')
                     ->searchable()
+                    ->badge()
+                    ->color(fn ($state) => match ($state) {
+                        'A+' => 'success',
+                        'A-' => 'danger',
+                        'B+' => 'info',
+                        'B-' => 'warning',
+                        'AB+' => 'primary',
+                        'AB-' => 'gray',
+                        'O+' => 'success',
+                        'O-' => 'danger',
+                        default => 'secondary', // Cor padrão caso o valor não corresponda
+                    })
                     ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('marital_status')
+                    ->label('Estado Civil')
                     ->searchable()
                     ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('education_level')
+                    ->label('Escolaridade')
                     ->searchable()
+                    ->toggleable(isToggledHiddenByDefault: true)
                     ->label('Escolaridade'),
                 Tables\Columns\TextColumn::make('roles.name')
                     ->searchable()

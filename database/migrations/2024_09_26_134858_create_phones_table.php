@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('phones', function (Blueprint $table) {
             $table->id();
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
-            $table->string('ddd');
+            //$table->string('ddd');
             $table->string('number');
             $table->string('type')->default('Celular')->nullable();
             $table->string('observation')->nullable();
