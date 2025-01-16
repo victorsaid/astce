@@ -25,6 +25,7 @@ class MeetingResource extends Resource
     protected static ?string $navigationIcon = 'heroicon-o-document-text';
     protected static ?string $modelLabel = 'Reunião';
     protected static ?string $pluralModelLabel = 'Reuniões';
+    protected static ?string $navigationGroup = 'Reuniões';
 
 
     public static function form(Form $form): Form
@@ -42,6 +43,7 @@ class MeetingResource extends Resource
                     ->maxLength(65535)
                     ->columnSpanFull(),
                 Forms\Components\Select::make('participants')
+                    ->label('Participantes')
                     ->multiple()
                     ->relationship('participants', 'name')
                     ->preload(),
@@ -72,11 +74,23 @@ class MeetingResource extends Resource
 
                 Forms\Components\FileUpload::make('attachments')
                     ->label('Anexos')
-                    ->maxFiles(5)
+                    ->acceptedFileTypes(['application/pdf']) // Aceitar apenas PDFs
+                    ->openable()
+                    ->directory('meeting_attachments') // Subdiretório para salvar as fotos
+                    ->disk('public') // Usa o disco padrão 'public'
+                    ->visibility('private')
+                    ->maxFiles(5) // Permite até 5 arquivos
+                    ->preserveFilenames()
                     ->columnSpan(1),
                 Forms\Components\FileUpload::make('photos')
                     ->label('Fotos')
+                    ->openable()
+                    ->downloadable()
+                    ->preserveFilenames()
                     ->maxFiles(5)
+                    ->multiple()
+                    ->directory('meeting_photos') // Subdiretório para salvar as fotos
+                    ->disk('public') // Usa o disco padrão 'public'
                     ->columnSpan(1),
             ]);
     }
@@ -105,7 +119,7 @@ class MeetingResource extends Resource
             ->actions([
                 Tables\Actions\ViewAction::make(),
                 Tables\Actions\EditAction::make(),
-                Action::make('sendEmail')
+                Tables\Actions\Action::make('sendEmail')
                     ->form([
                         TextInput::make('subject')->required(),
                         RichEditor::make('body')->required(),

@@ -66,12 +66,14 @@
 
 @endif
 
-@if ($meeting->attachments)
+@if ($meeting->photos)
     <div class="section">
         <p><strong>Anexos:</strong></p>
         <ul>
-            @foreach ($meeting->attachments as $attachment)
-                <li>{{ $attachment }}</li>
+            @foreach (is_array($meeting->photos) ? $meeting->photos : [$meeting->photos] as $photo)
+                <div>
+                    <img src="{{ base_path('public/storage/' . $photo) }}" alt="Anexo" style="max-width: 100%; height: auto; margin-bottom: 10px;">
+                </div>
             @endforeach
         </ul>
     </div>

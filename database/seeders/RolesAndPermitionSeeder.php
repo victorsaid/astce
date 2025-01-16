@@ -56,6 +56,11 @@ class RolesAndPermitionSeeder extends Seeder
         Permission::create(['name' => 'role_update', 'guard_name' => 'web']);
         Permission::create(['name' => 'role_delete', 'guard_name' => 'web']);
 
+        Permission::create(['name' => 'meeting_read', 'guard_name' => 'web']);
+        Permission::create(['name' => 'meeting_create', 'guard_name' => 'web']);
+        Permission::create(['name' => 'meeting_update', 'guard_name' => 'web']);
+        Permission::create(['name' => 'meeting_delete', 'guard_name' => 'web']);
+
 
         // update cache to know about the newly created permissions (required if using WithoutModelEvents in seeders)
         app()[\Spatie\Permission\PermissionRegistrar::class]->forgetCachedPermissions();
@@ -65,7 +70,8 @@ class RolesAndPermitionSeeder extends Seeder
         $role->givePermissionTo('access_panel',
                 'user_read', 'user_create', 'user_update', 'user_delete',
                 'employee_read', 'employee_create', 'employee_update', 'employee_delete',
-                'associate_read', 'associate_create', 'associate_update', 'associate_delete',);
+                'associate_read', 'associate_create', 'associate_update', 'associate_delete',
+                'meeting_read', 'meeting_create', 'meeting_update', 'meeting_delete');
 
 
         // role Associate
@@ -77,7 +83,8 @@ class RolesAndPermitionSeeder extends Seeder
         $role->givePermissionTo('access_panel',
                 'user_read', 'user_create', 'user_update', 'user_delete',
                 'employee_read', 'employee_create', 'employee_update', 'employee_delete',
-                'associate_read', 'associate_create', 'associate_update', 'associate_delete');
+                'associate_read', 'associate_create', 'associate_update', 'associate_delete',
+                'meeting_read', 'meeting_create', 'meeting_update', 'meeting_delete');
 
         //role Super_admin
         $role = Role::create(['name' => 'Super_admin', 'guard_name' => 'web']);
