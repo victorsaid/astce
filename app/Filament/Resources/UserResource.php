@@ -200,7 +200,7 @@ class UserResource extends Resource
                                                 ->required()
                                                 ->maxLength(255),
                                             Forms\Components\TextInput::make('neighborhood')
-                                                ->label('bairro')
+                                                ->label('Bairro')
                                                 ->required()
                                                 ->maxLength(255),
                                             Forms\Components\TextInput::make('street')

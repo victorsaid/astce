@@ -13,10 +13,10 @@ class AssociatedTypes extends Seeder
     public function run(): void
     {
         $associatedTypes = [
-            ['name' => 'Efetivo', 'abble_vote' => 'true'],
-            ['name' => 'Comissionado', 'abble_vote' => 'false'],
-            ['name' => 'Aposentado', 'abble_vote' => 'false'],
-            ['name' => 'Terceirizado', 'abble_vote' => 'false'],
+            ['name' => 'Efetivo', 'abble_vote' => '1'],
+            ['name' => 'Comissionado', 'abble_vote' => '0'],
+            ['name' => 'Aposentado', 'abble_vote' => '0'],
+            ['name' => 'Terceirizado', 'abble_vote' => '0'],
         ];
 
         foreach ($associatedTypes as $associatedType) {
