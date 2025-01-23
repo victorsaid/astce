@@ -30,4 +30,14 @@ class PdfController extends Controller
         // Retorna o PDF para download
         return $pdf->stream("reuniao_{$meeting->id}.pdf");
     }
+
+    public function pdfUsers()
+    {
+        $users = User::all();
+        //dd($users);
+
+        $pdf = Pdf::loadView('pdf.pdf_users', ['users' => $users]);
+        $pdf->set_option('isRemoteEnabled', true);
+        return $pdf->stream('pdf_users.pdf');
+    }
 }

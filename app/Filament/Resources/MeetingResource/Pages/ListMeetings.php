@@ -17,12 +17,12 @@ class ListMeetings extends ListRecords
         return [
             Actions\CreateAction::make(),
 
-            Actions\Action::make('criar pdf')
-                ->label('Criar PDF')
-                ->requiresConfirmation()
-                ->url(
-                    fn(): string => route('pdf.example', ['user' => Auth::user()])
-                ),
+//            Actions\Action::make('criar pdf')
+//                ->label('Criar PDF')
+//                ->requiresConfirmation()
+//                ->url(
+//                    fn(): string => route('pdf.example', ['user' => Auth::user()])
+//                ),
         ];
 
 

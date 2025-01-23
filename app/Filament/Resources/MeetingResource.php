@@ -22,7 +22,7 @@ class MeetingResource extends Resource
 {
     protected static ?string $model = Meeting::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-document-text';
+    protected static ?string $navigationIcon = 'fas-group-arrows-rotate';
     protected static ?string $modelLabel = 'Reunião';
     protected static ?string $pluralModelLabel = 'Reuniões';
     protected static ?string $navigationGroup = 'Reuniões';
@@ -38,8 +38,10 @@ class MeetingResource extends Resource
                     ->maxLength(255),
                 Forms\Components\DateTimePicker::make('date')
                     ->label('Data da reunião')
+                    ->format('DD/MM/YYYY HH:mm')
                     ->required(),
                 Forms\Components\Textarea::make('description')
+                    ->label('Descrição da reunião')
                     ->maxLength(65535)
                     ->columnSpanFull(),
                 Forms\Components\Select::make('participants')

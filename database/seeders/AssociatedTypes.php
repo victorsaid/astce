@@ -14,9 +14,9 @@ class AssociatedTypes extends Seeder
     {
         $associatedTypes = [
             ['name' => 'Efetivo', 'abble_vote' => '1'],
-            ['name' => 'Comissionado', 'abble_vote' => '1'],
+            ['name' => 'Comissionado', 'abble_vote' => '0'],
             ['name' => 'Aposentado', 'abble_vote' => '0'],
-            ['name' => 'Terceirizado', 'abble_vote' => '0'],
+            ['name' => 'Disposição', 'abble_vote' => '0'],
         ];
 
         foreach ($associatedTypes as $associatedType) {

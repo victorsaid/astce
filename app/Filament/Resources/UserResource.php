@@ -65,19 +65,21 @@ class UserResource extends Resource
                                         ->placeholder('000.000.000-00')
                                         ->required()
                                         ->mask('999.999.999-99')
-                                        ->unique(User::class, 'document', ignoreRecord: true)
-                                    ,
+                                        ->unique(User::class, 'document', ignoreRecord: true),
 
                                     Forms\Components\Select::make('gender')
                                         ->label('Gênero')
                                         ->required()
                                         ->options([
-                                            'M' => 'Masculino',
-                                            'F' => 'Feminino',
+                                            'masculino' => 'Masculino',
+                                            'feminino' => 'Feminino',
+                                            'nao_binario' => 'Não Binário',
+                                            'nao_informar' => 'Não Informar',
                                         ]),
 
                                     Forms\Components\DatePicker::make('birth_date')
                                         ->label('Data de Nascimento')
+                                        //->format('d/m/Y')
                                         ->required(),
 
                                     Forms\Components\Select::make('blood_type')
@@ -100,6 +102,7 @@ class UserResource extends Resource
                                             'casado' => 'Casado(a)',
                                             'divorciado' => 'Divorciado(a)',
                                             'viuvo' => 'Viúvo(a)',
+                                            'uniao_estavel' => 'União Estável',
                                         ]),
 
                                     Forms\Components\Select::make('education_level')
@@ -114,19 +117,14 @@ class UserResource extends Resource
                                             'doutorado' => 'Doutorado'
                                         ]),
                                 ]),
-                            ]), // Step 1
-                        Wizard\Step::make('Contatos')
+                            ]), // fim Step 1
+                        Wizard\Step::make('Contatos') //passo 2
                             ->schema([
                                 Forms\Components\Repeater::make('contacts')
                                     ->label('Contatos')
                                     ->relationship('phone')
                                     ->schema([
                                         Forms\Components\Grid::make(3)->schema([ // Organizando em 4 colunas
-//                                            Forms\Components\TextInput::make('ddd')
-//                                                ->label('DDD')
-//                                                ->required()
-//                                                ->mask('99')
-//                                                ->maxLength(2),
                                             Forms\Components\TextInput::make('number')
                                                 ->label('Telefone')
                                                 ->required()
@@ -148,9 +146,8 @@ class UserResource extends Resource
                                     ])
                                     ->columns(1) // Define uma repetição por linha
 
-                            ]),
-                        // Passo 2: Informações de endereço
-                        Wizard\Step::make('Endereço')
+                            ]),//fim Passo 2: Informações de endereço
+                        Wizard\Step::make('Endereço') //passo 3
                             ->schema([
                                 Forms\Components\Grid::make() // Organizando o layout em duas colunas
                                 ->schema([
@@ -216,7 +213,7 @@ class UserResource extends Resource
                                                 ->maxLength(255),
                                         ])
                                 ])
-                            ]),
+                            ]), //fim passo 3
 
                         // Passo 4: Informações de Acesso
                         Wizard\Step::make('Informações de Acesso')
@@ -251,9 +248,55 @@ class UserResource extends Resource
                                         ->multiple(),
                                 ]),
                             ]), //fecha step 4
+                            Wizard\Step::make('Associados') //passo 5
+                                ->schema([
+                                Forms\Components\Fieldset::make('Associados')
+                                    ->relationship('associate', 'associate')
+                                    ->schema([
+                                        Forms\Components\TextInput::make('enrollment')
+                                            ->label('Matrícula')
+                                            ->required()
+                                            ->maxLength(255),
+
+                                        Forms\Components\Select::make('associated_type_id')
+                                            ->label('Tipo de Membro')
+                                            ->relationship('associated_type', 'name')
+                                            ->required()
+                                            ->preload()
+                                            ->searchable(),
+
+                                        Forms\Components\Select::make('position_id')
+                                            ->label('Cargo')
+                                            ->required()
+                                            ->relationship('position', 'name'),
+
+                                        Forms\Components\DatePicker::make('association_date')
+                                            ->label('Data de Associação')
+                                            ->required(),
+
+                                        Forms\Components\ToggleButtons::make('is_active')
+                                            ->label('Associado Ativo?')
+                                            ->default(true)
+                                            ->inline()
+                                            ->options([
+                                                '0' => 'Não',
+                                                '1' => 'Sim',
+                                            ])
+                                            ->icons([
+                                                '0' => 'heroicon-o-x-mark',
+                                                '1' => 'heroicon-o-check',
+                                            ])
+                                            ->colors([
+                                                '0' => 'danger',
+                                                '1' => 'success',
+                                            ])
+                                        ,
+
+                                    ]),
+                                ]),
                     ]), //fecha wizard
 
-                ]),
+                ]),  //fecha grid
             ]); //fecha schema do form
     }
 
@@ -280,7 +323,7 @@ class UserResource extends Resource
                     ->date('d/m/Y')
                     ->sortable(),
                 Tables\Columns\TextColumn::make('phone.number')
-                    ->icon('heroicon-o-phone') // Ícone do Heroicons
+                    ->icon('fas-square-phone') // Ícone do Heroicons
                     ->color('success') // Cor opcional para destacar o ícone
                     ->label('Telefone')
                     ->searchable()
