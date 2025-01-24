@@ -38,7 +38,7 @@ class MeetingResource extends Resource
                     ->maxLength(255),
                 Forms\Components\DateTimePicker::make('date')
                     ->label('Data da reunião')
-                    ->format('DD/MM/YYYY HH:mm')
+                    ->date('d/m/Y')
                     ->required(),
                 Forms\Components\Textarea::make('description')
                     ->label('Descrição da reunião')

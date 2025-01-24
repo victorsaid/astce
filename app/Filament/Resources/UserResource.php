@@ -65,7 +65,9 @@ class UserResource extends Resource
                                         ->placeholder('000.000.000-00')
                                         ->required()
                                         ->mask('999.999.999-99')
-                                        ->unique(User::class, 'document', ignoreRecord: true),
+                                        ->dehydrated(true) // Sempre enviar o CPF para o servidor
+
+                                        ,
 
                                     Forms\Components\Select::make('gender')
                                         ->label('Gênero')
@@ -382,6 +384,7 @@ class UserResource extends Resource
             ->actions([
                 Tables\Actions\ViewAction::make(),
                 Tables\Actions\EditAction::make(),
+                Tables\Actions\DeleteAction::make(),
                 Tables\Actions\Action::make('sendEmail')
                     ->label('Enviar E-mail')
                     ->icon('heroicon-o-envelope')
@@ -461,9 +464,11 @@ class UserResource extends Resource
 
     public static function getEloquentQuery(): Builder
     {
-        return auth()->user()->hasRole(['admin', 'Super_admin'], ) ?
-            parent::getEloquentQuery() :
-            parent::getEloquentQuery()->whereHas('roles', fn($query) => $query->whereNotIn('name', ['Admin', 'Super_admin']));
+        return auth()->user()->hasRole(['admin', 'Super_admin'])
+            ? parent::getEloquentQuery()->whereHas('associate')
+            : parent::getEloquentQuery()
+                ->whereHas('employee') // Filtra apenas usuários que têm relação com employee
+                ->whereHas('roles', fn($query) => $query->whereNotIn('name', ['Admin', 'Super_admin']));
     }
 
 

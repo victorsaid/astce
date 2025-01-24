@@ -9,7 +9,7 @@
         "barryvdh/laravel-dompdf": "^3.0",
         "blade-ui-kit/blade-icons": "^1.7",
         "blade-ui-kit/blade-ui-kit": "^0.6.4",
-        "filament/filament": "3.2",
+        "filament/filament": "^3.2",
         "guzzlehttp/guzzle": "^7.2",
         "laravel/framework": "^10.0",
         "laravel/sanctum": "^3.2",
