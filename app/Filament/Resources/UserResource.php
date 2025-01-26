@@ -236,9 +236,9 @@ class UserResource extends Resource
                                         ->label('Senha')
                                         ->password()
                                         ->maxLength(255)
-                                        ->dehydrateStateUsing(fn($state) => filled($state) ? bcrypt($state) : null) // Criptografa a senha apenas se fornecida
-                                        ->required(fn(Page $livewire) => $livewire instanceof Pages\CreateUser) // Torna obrigatório apenas na criação
-                                        ->dehydrated(fn($state) => filled($state)), // Envia o valor apenas se não estiver vazio
+                                        ->dehydrateStateUsing(fn($state) => filled($state) ? bcrypt($state) : null) // Criptografa a senha somente se fornecida
+                                        ->required(false) // Torna o campo não obrigatório
+                                        ->dehydrated(true), // Sempre envia o valor do campo, mesmo vazio
 
 
                                     Forms\Components\Hidden::make('role')
@@ -316,7 +316,8 @@ class UserResource extends Resource
                     ->searchable()
                     ->label('CPF'),
                 Tables\Columns\TextColumn::make('email')
-                    ->searchable(),
+                    ->searchable()
+                    ->copyable(),
                 Tables\Columns\TextColumn::make('gender')
                     ->searchable()
                     ->label('Gênero')

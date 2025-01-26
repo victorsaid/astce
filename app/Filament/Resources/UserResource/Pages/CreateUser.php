@@ -14,13 +14,15 @@ class CreateUser extends CreateRecord
 
     protected function mutateFormDataBeforeCreate(array $data): array
     {
+
         $data['document'] = str_replace(['.', '-'], '', $data['document']);
         // Define a senha como o CPF, caso nenhuma senha seja fornecida
         if (empty($data['password'])) {
+            //dd($data['document']);
             $data['password'] = bcrypt($data['document']);
         }
         if (!isset($data['role'])) {
-            $data['role'] = ['Associate'];
+            $data['role'] = 'Associate';
         }
         return $data;
     }
@@ -29,7 +31,6 @@ class CreateUser extends CreateRecord
     {
         // Verificar se o CPF já existe no banco de dados
         $existingUser = \App\Models\User::where('document', $data['document'])->first();
-
         if ($existingUser) {
             // Atualizar os dados básicos do usuário existente
             $existingUser->update([
@@ -56,7 +57,11 @@ class CreateUser extends CreateRecord
             return $existingUser;
         }
         if (!$existingUser) {
+            if (empty($data['password'])) {
+                $data['password'] = bcrypt($data['document']);
+            }
             $newUser = \App\Models\User::create($data);
+            $newUser->assignRole($data['role'] ?? 'Associate');
 
             \Filament\Notifications\Notification::make()
                 ->title('Usuário criado com sucesso!')
