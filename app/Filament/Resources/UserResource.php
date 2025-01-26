@@ -64,9 +64,8 @@ class UserResource extends Resource
                                         ->label('CPF')
                                         ->placeholder('000.000.000-00')
                                         ->required()
-                                        ->mask('999.999.999-99')
-                                        ->dehydrated(true) // Sempre enviar o CPF para o servidor
-
+                                        ->mask('999.999.999-99') // Máscara para CPF
+                                        ->dehydrated(true) // Sempre envia o valor do campo, mesmo vazio
                                         ,
 
                                     Forms\Components\Select::make('gender')
