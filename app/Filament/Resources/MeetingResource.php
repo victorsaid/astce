@@ -68,8 +68,8 @@ class MeetingResource extends Resource
                         Forms\Components\TextInput::make('description')
                             ->label('Descrição da pauta')
                             ->maxLength(65535),
-                        Forms\Components\MarkdownEditor::make('content')
-                            ->label('Descrição da pauta')
+                        Forms\Components\Textarea::make('content')
+                            ->label('Conteúdo da pauta')
                             ->maxLength(65535)
                             ->columnSpanFull(),
                     ])->columnSpanFull(),

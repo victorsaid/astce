@@ -33,8 +33,13 @@ class PdfController extends Controller
 
     public function pdfUsers()
     {
-        $users = User::all();
-        //dd($users);
+        $users = User::whereHas('associate', function ($query) {
+            $query->where('is_active', true); // Filtra associados ativos
+        })
+            ->with(['associate' => function ($query) {
+                $query->where('is_active', true); // Carrega apenas associados ativos
+            }])
+            ->get();
 
         $pdf = Pdf::loadView('pdf.pdf_users', ['users' => $users]);
         $pdf->set_option('isRemoteEnabled', true);

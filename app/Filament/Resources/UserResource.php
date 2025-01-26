@@ -229,30 +229,33 @@ class UserResource extends Resource
                                         ->required()
                                         ->maxLength(255),
 
-                                    Forms\Components\DateTimePicker::make('email_verified_at')
+                                    Forms\Components\Hidden::make('email_verified_at')
                                         ->label('Email Verificado Em'),
 
                                     Forms\Components\TextInput::make('password')
                                         ->label('Senha')
                                         ->password()
                                         ->maxLength(255)
-                                        ->dehydrateStateUsing(fn($state) => filled($state) ? bcrypt($state) : null) // Apenas criptografa se o campo estiver preenchido
-                                        ->required(fn(Page $livewire) => $livewire instanceof Pages\CreateUser) // Senha obrigatória apenas na criação
-                                        ->dehydrated(fn($state) => filled($state)), // Evita que o campo seja enviado se estiver vazio
-                                    Forms\Components\Select::make('role')
+                                        ->dehydrateStateUsing(fn($state) => filled($state) ? bcrypt($state) : null) // Criptografa a senha apenas se fornecida
+                                        ->required(fn(Page $livewire) => $livewire instanceof Pages\CreateUser) // Torna obrigatório apenas na criação
+                                        ->dehydrated(fn($state) => filled($state)), // Envia o valor apenas se não estiver vazio
+
+
+                                    Forms\Components\Hidden::make('role')
                                         ->label('Perfil')
-                                        ->relationship('roles', 'name',
-                                            fn(Builder $query) => auth()->user()->hasRole(['Admin', 'Super_admin']) ? null :
-                                                $query->whereNotIn('name', ['Admin', 'Super_admin'])
-                                        )
-                                        ->required()
-                                        ->preload()
-                                        ->multiple(),
+//                                        ->relationship('roles', 'name',
+//                                            fn(Builder $query) => auth()->user()->hasRole(['Admin', 'Super_admin']) ? null :
+//                                                $query->whereNotIn('name', ['Admin', 'Super_admin'])
+//                                        )
+                                        //->required()
+                                        //->preload()
+                                        //->multiple()
+                                    ,
                                 ]),
                             ]), //fecha step 4
                             Wizard\Step::make('Associados') //passo 5
                                 ->schema([
-                                Forms\Components\Fieldset::make('Associados')
+                                Forms\Components\Fieldset::make('Informações sobre o Associado')
                                     ->relationship('associate', 'associate')
                                     ->schema([
                                         Forms\Components\TextInput::make('enrollment')
@@ -264,8 +267,7 @@ class UserResource extends Resource
                                             ->label('Tipo de Membro')
                                             ->relationship('associated_type', 'name')
                                             ->required()
-                                            ->preload()
-                                            ->searchable(),
+                                            ->preload(),
 
                                         Forms\Components\Select::make('position_id')
                                             ->label('Cargo')
@@ -336,6 +338,9 @@ class UserResource extends Resource
                         : null
                     )
                     ->openUrlInNewTab(),
+                Tables\Columns\IconColumn::make('associate.is_active')
+                    ->label('Ativo?')
+                    ->boolean(),
                 Tables\Columns\TextColumn::make('blood_type')
                     ->label('Tipo Sanguíneo')
                     ->searchable()
@@ -361,10 +366,6 @@ class UserResource extends Resource
                     ->searchable()
                     ->toggleable(isToggledHiddenByDefault: true)
                     ->label('Escolaridade'),
-                Tables\Columns\TextColumn::make('roles.name')
-                    ->searchable()
-                    ->label('Perfil')
-                    ,
                 Tables\Columns\TextColumn::make('email_verified_at')
                     ->dateTime()
                     ->sortable()
@@ -382,7 +383,7 @@ class UserResource extends Resource
                 //
             ])
             ->actions([
-                Tables\Actions\ViewAction::make(),
+                //Tables\Actions\ViewAction::make(),
                 Tables\Actions\EditAction::make(),
                 Tables\Actions\DeleteAction::make(),
                 Tables\Actions\Action::make('sendEmail')

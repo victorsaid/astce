@@ -16,6 +16,8 @@ class ViewMeeting extends ViewRecord
         return [
             Actions\EditAction::make(),
             Actions\Action::make('Exportar Reunião')
+                ->icon('fas-file-pdf')
+                ->color('danger')
                 ->label('Exportar')
                 ->requiresConfirmation()
                 ->url(

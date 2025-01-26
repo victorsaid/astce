@@ -24,7 +24,7 @@ class FuncTesteResource extends Resource
     protected static ?string $model = User::class;
     protected static ?string $navigationGroup = 'Usuários';
 
-    protected static ?string $navigationIcon = 'heroicon-o-book-open';
+    protected static ?string $navigationIcon = 'fas-user-cog';
 
     public static function form(Form $form): Form
     {
@@ -225,7 +225,7 @@ class FuncTesteResource extends Resource
                                         ->password()
                                         ->maxLength(255)
                                         ->dehydrateStateUsing(fn($state) => filled($state) ? bcrypt($state) : null) // Apenas criptografa se o campo estiver preenchido
-                                        ->required(fn(Page $livewire) => $livewire instanceof Pages\CreateUser) // Senha obrigatória apenas na criação
+                                        ->required(fn(Page $livewire) => $livewire instanceof Pages\CreateFuncTeste) // Senha obrigatória apenas na criação
                                         ->dehydrated(fn($state) => filled($state)), // Evita que o campo seja enviado se estiver vazio
                                     Forms\Components\Select::make('role')
                                         ->label('Perfil')

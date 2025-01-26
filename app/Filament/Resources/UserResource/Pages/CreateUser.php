@@ -15,6 +15,13 @@ class CreateUser extends CreateRecord
     protected function mutateFormDataBeforeCreate(array $data): array
     {
         $data['document'] = str_replace(['.', '-'], '', $data['document']);
+        // Define a senha como o CPF, caso nenhuma senha seja fornecida
+        if (empty($data['password'])) {
+            $data['password'] = bcrypt($data['document']);
+        }
+        if (!isset($data['role'])) {
+            $data['role'] = ['Associate'];
+        }
         return $data;
     }
 
@@ -30,6 +37,7 @@ class CreateUser extends CreateRecord
                 'email' => $data['email'] ?? $existingUser->email,
                 'gender' => $data['gender'] ?? $existingUser->gender,
                 'birth_date' => $data['birth_date'] ?? $existingUser->birth_date,
+                //'marital_status' => $data['marital_status'] ?? $existingUser->marital_status,
             ]);
 
             // Atualizar ou criar informações de associado
@@ -46,6 +54,17 @@ class CreateUser extends CreateRecord
 
             // Retornar o registro existente para impedir a criação de um novo
             return $existingUser;
+        }
+        if (!$existingUser) {
+            $newUser = \App\Models\User::create($data);
+
+            \Filament\Notifications\Notification::make()
+                ->title('Usuário criado com sucesso!')
+                ->body("Um novo usuário com CPF {$data['document']} foi criado.")
+                ->success()
+                ->send();
+
+            return $newUser;
         }
 
         // Criar um novo registro se o CPF não existir

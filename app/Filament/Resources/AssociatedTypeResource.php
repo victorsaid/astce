@@ -19,7 +19,7 @@ class AssociatedTypeResource extends Resource
     protected static ?string $navigationGroup = 'Cadastros auxiliares';
     protected static ?string $modelLabel = 'Tipos de associados';
 
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static ?string $navigationIcon = 'fas-boxes';
 
     public static function form(Form $form): Form
     {

@@ -31,22 +31,28 @@
     </style>
 </head>
 <body>
+<div style="text-align: center; margin-bottom: 20px;">
+    <img src="{{ base_path('public/storage/logo/Logoastce.png') }}"
+         style="width: 150px; height: auto;"
+         alt="Logo">
+</div>
 <h1>Associados</h1>
+<p>Emitido em {{ \Carbon\Carbon::now()->format('d/m/Y H:i') }}</p>
 <table>
     <thead>
     <tr>
-        <th>ID</th>
+        <th>#</th>
         <th>Nome</th>
-{{--        <th>Descrição</th>--}}
+        <th>Matrícula</th>
 {{--        <th>Data</th>--}}
     </tr>
     </thead>
     <tbody>
     @foreach ($users as $user)
         <tr>
-            <td>{{ $user->id }}</td>
+            <td>{{$loop->iteration}}</td>
             <td>{{ $user->name }}</td>
-{{--            <td>{{ $meeting->description }}</td>--}}
+            <td>{{ $user->associate->enrollment }}</td>
 {{--            <td>{{ \Carbon\Carbon::parse($meeting->date)->format('d/m/Y H:i') }}</td>--}}
         </tr>
     @endforeach
