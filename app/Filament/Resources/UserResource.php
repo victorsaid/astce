@@ -228,8 +228,6 @@ class UserResource extends Resource
                                         ->unique(
                                             modifyRuleUsing: function ($rule, callable $get) {
                                                 $document = str_replace(['.', '-'], '', $get('document')); // Remove máscara do CPF
-
-                                                // Ajusta a regra para ignorar o CPF existente
                                                 return $rule->whereNot('document', $document);
                                             }
                                         )
@@ -319,8 +317,14 @@ class UserResource extends Resource
                     ->searchable()
                     ->label('Nome'),
                 Tables\Columns\TextColumn::make('document')
+                    ->label('CPF')
                     ->searchable()
-                    ->label('CPF'),
+                    ->formatStateUsing(fn ($state) =>
+                        substr($state, 0, 3) . '.' .
+                        substr($state, 3, 3) . '.' .
+                        substr($state, 6, 3) . '-' .
+                        substr($state, 9, 2)
+                    ),
                 Tables\Columns\TextColumn::make('email')
                     ->searchable()
                     ->copyable(),
