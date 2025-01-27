@@ -224,8 +224,15 @@ class UserResource extends Resource
                                     Forms\Components\TextInput::make('email')
                                         ->label('Email')
                                         ->email()
-                                        ->unique(User::class, 'email', ignoreRecord: true)
-                                        ->required()
+                                        ->required() // E-mail é obrigatório apenas para novos registros
+                                        ->unique(
+                                            modifyRuleUsing: function ($rule, callable $get) {
+                                                $document = str_replace(['.', '-'], '', $get('document')); // Remove máscara do CPF
+
+                                                // Ajusta a regra para ignorar o CPF existente
+                                                return $rule->whereNot('document', $document);
+                                            }
+                                        )
                                         ->maxLength(255),
 
                                     Forms\Components\Hidden::make('email_verified_at')

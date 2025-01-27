@@ -31,19 +31,24 @@ class CreateUser extends CreateRecord
     {
         // Verificar se o CPF já existe no banco de dados
         $existingUser = \App\Models\User::where('document', $data['document'])->first();
+
         if ($existingUser) {
-            // Atualizar os dados básicos do usuário existente
+            // Atualizar os dados básicos do usuário existente, mas não alterar a senha
             $existingUser->update([
                 'name' => $data['name'] ?? $existingUser->name,
                 'email' => $data['email'] ?? $existingUser->email,
                 'gender' => $data['gender'] ?? $existingUser->gender,
                 'birth_date' => $data['birth_date'] ?? $existingUser->birth_date,
-                //'marital_status' => $data['marital_status'] ?? $existingUser->marital_status,
+                'marital_status' => $data['marital_status'] ?? $existingUser->marital_status,
             ]);
 
             // Atualizar ou criar informações de associado
-            if (isset($data['associate'])) {
-                $existingUser->associate()->updateOrCreate([], $data['associate']);
+//            if (isset($data['associate'])) {
+//                $existingUser->associate()->updateOrCreate([], $data['associate']);
+//            }
+
+            if (isset($data['employee'])) {
+                $existingUser->employee()->updateOrCreate([], $data['employee']);
             }
 
             // Notificar o usuário que o registro foi atualizado
@@ -56,10 +61,13 @@ class CreateUser extends CreateRecord
             // Retornar o registro existente para impedir a criação de um novo
             return $existingUser;
         }
+
+        // Se o CPF não existir, criar um novo registro
         if (!$existingUser) {
             if (empty($data['password'])) {
                 $data['password'] = bcrypt($data['document']);
             }
+
             $newUser = \App\Models\User::create($data);
             $newUser->assignRole($data['role'] ?? 'Associate');
 
@@ -75,6 +83,7 @@ class CreateUser extends CreateRecord
         // Criar um novo registro se o CPF não existir
         return parent::handleRecordCreation($data);
     }
+
 
 
 
