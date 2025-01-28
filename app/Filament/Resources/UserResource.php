@@ -43,11 +43,11 @@ use Filament\Tables\Columns\TextColumn;
 class UserResource extends Resource
 {
     protected static ?string $model = User::class;
-    protected static ?string $modelLabel = 'Usuários';
-    protected static ?string $pluralModelLabel = 'Usuários';
-    protected static ?string $slug = 'users';
+    protected static ?string $modelLabel = 'Associado';
+    protected static ?string $pluralModelLabel = 'Associados';
+    protected static ?string $slug = 'associados';
     protected static ?string $navigationGroup = 'Usuários';
-    protected static ?string $navigationIcon = 'heroicon-o-user';
+    protected static ?string $navigationIcon = 'fas-user-tie';
 
     public static function form(Form $form): Form
     {
@@ -472,7 +472,7 @@ class UserResource extends Resource
     public static function getRelations(): array
     {
         return [
-            //
+            RelationManagers\DependantsRelationManager::make()
         ];
     }
 

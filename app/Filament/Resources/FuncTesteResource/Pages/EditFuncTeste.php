@@ -2,14 +2,14 @@
 
 namespace App\Filament\Resources\FuncTesteResource\Pages;
 
-use App\Filament\Resources\FuncTesteResource;
+use App\Filament\Resources\EmployeeResource;
 use Filament\Actions;
 use Filament\Resources\Pages\EditRecord;
 use Illuminate\Database\Eloquent\Model;
 
 class EditFuncTeste extends EditRecord
 {
-    protected static string $resource = FuncTesteResource::class;
+    protected static string $resource = EmployeeResource::class;
 
     protected function mutateFormDataBeforeSave(array $data): array
     {

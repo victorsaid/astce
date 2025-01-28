@@ -2,13 +2,13 @@
 
 namespace App\Filament\Resources\FuncTesteResource\Pages;
 
-use App\Filament\Resources\FuncTesteResource;
+use App\Filament\Resources\EmployeeResource;
 use Filament\Actions;
 use Filament\Resources\Pages\ListRecords;
 
 class ListFuncTestes extends ListRecords
 {
-    protected static string $resource = FuncTesteResource::class;
+    protected static string $resource = EmployeeResource::class;
 
     protected function getHeaderActions(): array
     {

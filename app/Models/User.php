@@ -55,6 +55,11 @@ class User extends Authenticatable implements FilamentUser
         'photo' => 'array',
     ];
 
+    public function agreements()
+    {
+        return $this->belongsToMany(Agreements::class, 'agreement_user');
+    }
+
     public function associate()
     {
         return $this->hasOne(Associate::class);
@@ -70,6 +75,10 @@ class User extends Authenticatable implements FilamentUser
     public function phone()
     {
         return $this->hasOne(Phone::class);
+    }
+    public function dependants()
+    {
+        return $this->hasMany(Dependant::class);
     }
 
     public function meetings()

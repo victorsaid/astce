@@ -16,8 +16,8 @@ class Dependant extends Model
         'relation',
     ];
 
-    public function associate()
+    public function user()
     {
-        return $this->belongsTo(Associate::class);
+        return $this->belongsTo(User::class);
     }
 }

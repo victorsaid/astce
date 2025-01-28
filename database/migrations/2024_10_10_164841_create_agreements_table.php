@@ -15,7 +15,17 @@ return new class extends Migration
             $table->id();
             $table->string('name');
             $table->string('description');
+            $table->json('photo')->nullable();
+            $table->string('site');
+            $table->string('type');
             $table->boolean('is_active')->default(true);
+            $table->timestamps();
+        });
+
+        Schema::create('agreement_user', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('user_id')->constrained()->onDelete('cascade');
+            $table->foreignId('agreement_id')->constrained()->onDelete('cascade');
             $table->timestamps();
         });
     }
