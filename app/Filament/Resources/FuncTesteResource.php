@@ -8,6 +8,12 @@ use App\Models\FuncTeste;
 use App\Models\User;
 use Filament\Forms;
 use Filament\Forms\Components\Actions\Action;
+use Filament\Forms\Components\DatePicker;
+use Filament\Forms\Components\FileUpload;
+use Filament\Forms\Components\Grid;
+use Filament\Forms\Components\Hidden;
+use Filament\Forms\Components\Select;
+use Filament\Forms\Components\TextInput;
 use Filament\Forms\Form;
 use Filament\Notifications\Notification;
 use Filament\Pages\Page;
@@ -38,26 +44,25 @@ class FuncTesteResource extends Resource
                             ->schema([
                                 Forms\Components\Grid::make(3) // Dividindo em 2 colunas para melhorar layout
                                 ->schema([
-                                    Forms\Components\FileUpload::make('photo')
+                                    FileUpload::make('photo')
                                         ->label('Foto')
                                         ->imageEditor()
                                         ->avatar()
                                         ->directory('profile_photos')
                                         ->preserveFilenames()
                                         ->disk('public'),
-                                    Forms\Components\TextInput::make('name')
-                                        ->label('Nome Completo')
-                                        ->required()
-                                        ->maxLength(255),
-
-                                    Forms\Components\TextInput::make('document')
+                                    TextInput::make('document')
                                         ->label('CPF')
                                         ->placeholder('000.000.000-00')
                                         ->required()
-                                        ->mask('999.999.999-99')
-                                        ->unique(User::class, 'document', ignoreRecord: true),
-
-                                    Forms\Components\Select::make('gender')
+                                        ->mask('999.999.999-99') // Máscara para CPF
+                                        ->dehydrated(true) // Sempre envia o valor do campo, mesmo vazio
+                                    ,
+                                    TextInput::make('name')
+                                        ->label('Nome Completo')
+                                        ->required()
+                                        ->maxLength(255),
+                                    Select::make('gender')
                                         ->label('Gênero')
                                         ->required()
                                         ->options([
@@ -66,13 +71,11 @@ class FuncTesteResource extends Resource
                                             'nao_binario' => 'Não Binário',
                                             'nao_informar' => 'Não Informar',
                                         ]),
-
-                                    Forms\Components\DatePicker::make('birth_date')
+                                    DatePicker::make('birth_date')
                                         ->label('Data de Nascimento')
-                                        //->format('d/m/Y')
+                                        ->date('d/m/Y')
                                         ->required(),
-
-                                    Forms\Components\Select::make('blood_type')
+                                    Select::make('blood_type')
                                         ->label('Tipo Sanguíneo')
                                         ->options([
                                             'A+' => 'A+',
@@ -84,7 +87,7 @@ class FuncTesteResource extends Resource
                                             'O+' => 'O+',
                                             'O-' => 'O-',
                                         ]),
-                                    Forms\Components\Select::make('marital_status')
+                                    Select::make('marital_status')
                                         ->label('Estado Civil')
                                         ->required()
                                         ->options([
@@ -94,8 +97,7 @@ class FuncTesteResource extends Resource
                                             'viuvo' => 'Viúvo(a)',
                                             'uniao_estavel' => 'União Estável',
                                         ]),
-
-                                    Forms\Components\Select::make('education_level')
+                                    Select::make('education_level')
                                         ->required()
                                         ->label('Nível de Escolaridade')
                                         ->options([
@@ -208,34 +210,42 @@ class FuncTesteResource extends Resource
                         // Passo 4: Informações de Acesso
                         Wizard\Step::make('Informações de Acesso')
                             ->schema([
-                                Forms\Components\Grid::make() // Organizando o layout em duas colunas
+                                Grid::make() // Organizando o layout em duas colunas
                                 ->schema([
-                                    Forms\Components\TextInput::make('email')
+                                    TextInput::make('email')
                                         ->label('Email')
                                         ->email()
-                                        ->unique(User::class, 'email', ignoreRecord: true)
-                                        ->required()
+                                        ->required() // E-mail é obrigatório apenas para novos registros
+                                        ->unique(
+                                            modifyRuleUsing: function ($rule, callable $get) {
+                                                $document = str_replace(['.', '-'], '', $get('document')); // Remove máscara do CPF
+                                                return $rule->whereNot('document', $document);
+                                            }
+                                        )
                                         ->maxLength(255),
 
-                                    Forms\Components\DateTimePicker::make('email_verified_at')
+                                    Hidden::make('email_verified_at')
                                         ->label('Email Verificado Em'),
 
-                                    Forms\Components\TextInput::make('password')
+                                    TextInput::make('password')
                                         ->label('Senha')
                                         ->password()
                                         ->maxLength(255)
-                                        ->dehydrateStateUsing(fn($state) => filled($state) ? bcrypt($state) : null) // Apenas criptografa se o campo estiver preenchido
-                                        ->required(fn(Page $livewire) => $livewire instanceof Pages\CreateFuncTeste) // Senha obrigatória apenas na criação
-                                        ->dehydrated(fn($state) => filled($state)), // Evita que o campo seja enviado se estiver vazio
-                                    Forms\Components\Select::make('role')
+                                        ->dehydrateStateUsing(fn($state) => filled($state) ? bcrypt($state) : null) // Criptografa a senha somente se fornecida
+                                        ->required(false) // Torna o campo não obrigatório
+                                        ->dehydrated(true), // Sempre envia o valor do campo, mesmo vazio
+
+
+                                    Hidden::make('role')
                                         ->label('Perfil')
-                                        ->relationship('roles', 'name',
-                                            fn(Builder $query) => auth()->user()->hasRole(['Admin', 'Super_admin']) ? null :
-                                                $query->whereNotIn('name', ['Admin', 'Super_admin'])
-                                        )
-                                        ->required()
-                                        ->preload()
-                                        ->multiple(),
+//                                        ->relationship('roles', 'name',
+//                                            fn(Builder $query) => auth()->user()->hasRole(['Admin', 'Super_admin']) ? null :
+//                                                $query->whereNotIn('name', ['Admin', 'Super_admin'])
+//                                        )
+                                    //->required()
+                                    //->preload()
+                                    //->multiple()
+                                    ,
                                 ]),
                             ]), //fecha step 4
                         Wizard\Step::make('Funcionário') //passo 5
@@ -243,14 +253,15 @@ class FuncTesteResource extends Resource
                             Forms\Components\Fieldset::make('funcionarios')
                                 ->relationship('employee', 'employee')
                                 ->schema([
-                                    Forms\Components\DatePicker::make('hire_date')
+                                    DatePicker::make('hire_date')
                                         ->label('Data de Contratação')
                                         ->required(),
-                                    Forms\Components\TextInput::make('salary')
-                                        ->required()
+                                    TextInput::make('salary')
                                         ->label('Salário')
-                                        ->prefix('R$')
-                                    ,
+                                        ->required()
+                                        ->prefix('R$') // Adiciona o prefixo para o símbolo da moeda
+                                        ->numeric(), // Garante que apenas valores numéricos sejam aceitos
+
                                     Forms\Components\ToggleButtons::make('is_active')
                                         ->label('Funcionário Ativo?')
                                         ->default(true)

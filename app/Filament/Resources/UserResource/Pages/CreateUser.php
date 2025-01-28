@@ -22,12 +22,13 @@ class CreateUser extends CreateRecord
             $data['password'] = bcrypt($data['document']);
         }
         if (!isset($data['role'])) {
+
             $data['role'] = 'Associate';
         }
         return $data;
     }
 
-    protected function handleRecordCreation(array $data): \App\Models\User
+    protected function handleRecordCreation(array $data): \Illuminate\Database\Eloquent\Model
     {
         // Verificar se o CPF já existe no banco de dados
         $existingUser = \App\Models\User::where('document', $data['document'])->first();
@@ -47,9 +48,9 @@ class CreateUser extends CreateRecord
 //                $existingUser->associate()->updateOrCreate([], $data['associate']);
 //            }
 
-            if (isset($data['employee'])) {
-                $existingUser->employee()->updateOrCreate([], $data['employee']);
-            }
+//            if (isset($data['employee'])) {
+//                $existingUser->employee()->updateOrCreate([], $data['employee']);
+//            }
 
             // Notificar o usuário que o registro foi atualizado
             \Filament\Notifications\Notification::make()
@@ -58,6 +59,7 @@ class CreateUser extends CreateRecord
                 ->success()
                 ->send();
 
+            $existingUser->assignRole($data['role'] ?? 'Associate');
             // Retornar o registro existente para impedir a criação de um novo
             return $existingUser;
         }

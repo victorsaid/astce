@@ -26,6 +26,19 @@ use Filament\Forms\Components\TextInput;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\UserMessageMail;
 use Illuminate\Database\Eloquent\Collection;
+use Filament\Forms\Components\FileUpload;
+use Filament\Forms\Components\Select;
+use Filament\Forms\Components\DatePicker;
+use Filament\Forms\Components\Repeater;
+use Filament\Forms\Components\ToggleButtons;
+use Filament\Forms\Components\Fieldset;
+use Filament\Forms\Components\Grid;
+use Filament\Forms\Components\Hidden;
+use Filament\Tables\Columns\IconColumn;
+use Filament\Tables\Columns\TextColumn;
+
+
+
 
 class UserResource extends Resource
 {
@@ -40,35 +53,33 @@ class UserResource extends Resource
     {
         return $form
             ->schema([
-                Forms\Components\Grid::make(1) //grid maior
+                Grid::make(1) //grid maior
                 ->schema([
-                    Forms\Components\Wizard::make([
+                    Wizard::make([
                         // Passo 1: Informações Pessoais
                         Wizard\Step::make('Informações Pessoais')
                             ->schema([
-                                Forms\Components\Grid::make(3) // Dividindo em 2 colunas para melhorar layout
+                                Grid::make(3) // Dividindo em 2 colunas para melhorar layout
                                 ->schema([
-                                    Forms\Components\FileUpload::make('photo')
+                                    FileUpload::make('photo')
                                         ->label('Foto')
                                         ->imageEditor()
                                         ->avatar()
                                         ->directory('profile_photos')
                                         ->preserveFilenames()
                                         ->disk('public'),
-                                    Forms\Components\TextInput::make('name')
-                                        ->label('Nome Completo')
-                                        ->required()
-                                        ->maxLength(255),
-
-                                    Forms\Components\TextInput::make('document')
+                                    TextInput::make('document')
                                         ->label('CPF')
                                         ->placeholder('000.000.000-00')
                                         ->required()
                                         ->mask('999.999.999-99') // Máscara para CPF
                                         ->dehydrated(true) // Sempre envia o valor do campo, mesmo vazio
-                                        ,
-
-                                    Forms\Components\Select::make('gender')
+                                    ,
+                                    TextInput::make('name')
+                                        ->label('Nome Completo')
+                                        ->required()
+                                        ->maxLength(255),
+                                    Select::make('gender')
                                         ->label('Gênero')
                                         ->required()
                                         ->options([
@@ -77,13 +88,11 @@ class UserResource extends Resource
                                             'nao_binario' => 'Não Binário',
                                             'nao_informar' => 'Não Informar',
                                         ]),
-
-                                    Forms\Components\DatePicker::make('birth_date')
+                                    DatePicker::make('birth_date')
                                         ->label('Data de Nascimento')
-                                        //->format('d/m/Y')
+                                        ->date('d/m/Y')
                                         ->required(),
-
-                                    Forms\Components\Select::make('blood_type')
+                                    Select::make('blood_type')
                                         ->label('Tipo Sanguíneo')
                                         ->options([
                                             'A+' => 'A+',
@@ -95,7 +104,7 @@ class UserResource extends Resource
                                             'O+' => 'O+',
                                             'O-' => 'O-',
                                         ]),
-                                    Forms\Components\Select::make('marital_status')
+                                    Select::make('marital_status')
                                         ->label('Estado Civil')
                                         ->required()
                                         ->options([
@@ -105,8 +114,7 @@ class UserResource extends Resource
                                             'viuvo' => 'Viúvo(a)',
                                             'uniao_estavel' => 'União Estável',
                                         ]),
-
-                                    Forms\Components\Select::make('education_level')
+                                    Select::make('education_level')
                                         ->required()
                                         ->label('Nível de Escolaridade')
                                         ->options([
@@ -121,18 +129,18 @@ class UserResource extends Resource
                             ]), // fim Step 1
                         Wizard\Step::make('Contatos') //passo 2
                             ->schema([
-                                Forms\Components\Repeater::make('contacts')
+                                Repeater::make('contacts')
                                     ->label('Contatos')
                                     ->relationship('phone')
                                     ->schema([
-                                        Forms\Components\Grid::make(3)->schema([ // Organizando em 4 colunas
-                                            Forms\Components\TextInput::make('number')
+                                        Grid::make(3)->schema([ // Organizando em 4 colunas
+                                            TextInput::make('number')
                                                 ->label('Telefone')
                                                 ->required()
                                                 ->placeholder('(xx)xxxxx-xxxx')
                                                 ->mask('(99)99999-9999')
                                                 ->dehydrateStateUsing(fn($state) => preg_replace('/[^0-9]/', '', $state)), // Remove caracteres não numéricos
-                                            Forms\Components\Select::make('type')
+                                            Select::make('type')
                                                 ->label('Tipo de contato')
                                                 ->required()
                                                 ->options([
@@ -140,7 +148,7 @@ class UserResource extends Resource
                                                     'Residencial' => 'Residencial',
                                                     'Comercial' => 'Comercial',
                                                 ]),
-                                            Forms\Components\TextInput::make('observation')
+                                            TextInput::make('observation')
                                                 ->label('Observação')
                                                 ->maxLength(255),
                                         ]),
@@ -152,10 +160,10 @@ class UserResource extends Resource
                             ->schema([
                                 Forms\Components\Grid::make() // Organizando o layout em duas colunas
                                 ->schema([
-                                    Forms\Components\Fieldset::make('Endereço')
+                                    Fieldset::make('Endereço')
                                         ->relationship('address', 'address')
                                         ->schema([
-                                            Forms\Components\TextInput::make('zip_code')
+                                            TextInput::make('zip_code')
                                                 ->label('CEP')
                                                 ->suffixAction(
                                                     fn($state, $set) => Action::make('search-action')
@@ -189,27 +197,27 @@ class UserResource extends Resource
                                                         })
                                                 )
                                                 ->mask('99999-999'),
-                                            Forms\Components\TextInput::make('state')
+                                            TextInput::make('state')
                                                 ->label('Estado')
                                                 ->required()
                                                 ->maxLength(255),
-                                            Forms\Components\TextInput::make('city')
+                                            TextInput::make('city')
                                                 ->label('Cidade')
                                                 ->required()
                                                 ->maxLength(255),
-                                            Forms\Components\TextInput::make('neighborhood')
+                                            TextInput::make('neighborhood')
                                                 ->label('Bairro')
                                                 ->required()
                                                 ->maxLength(255),
-                                            Forms\Components\TextInput::make('street')
+                                            TextInput::make('street')
                                                 ->label('Rua')
                                                 ->required()
                                                 ->maxLength(255),
-                                            Forms\Components\TextInput::make('number')
+                                            TextInput::make('number')
                                                 ->label('Número')
                                                 ->required()
                                                 ->maxLength(255),
-                                            Forms\Components\TextInput::make('complement')
+                                            TextInput::make('complement')
                                                 ->label('Complemento')
                                                 ->maxLength(255),
                                         ])
@@ -219,9 +227,9 @@ class UserResource extends Resource
                         // Passo 4: Informações de Acesso
                         Wizard\Step::make('Informações de Acesso')
                             ->schema([
-                                Forms\Components\Grid::make() // Organizando o layout em duas colunas
+                                Grid::make() // Organizando o layout em duas colunas
                                 ->schema([
-                                    Forms\Components\TextInput::make('email')
+                                    TextInput::make('email')
                                         ->label('Email')
                                         ->email()
                                         ->required() // E-mail é obrigatório apenas para novos registros
@@ -233,10 +241,10 @@ class UserResource extends Resource
                                         )
                                         ->maxLength(255),
 
-                                    Forms\Components\Hidden::make('email_verified_at')
+                                    Hidden::make('email_verified_at')
                                         ->label('Email Verificado Em'),
 
-                                    Forms\Components\TextInput::make('password')
+                                    TextInput::make('password')
                                         ->label('Senha')
                                         ->password()
                                         ->maxLength(255)
@@ -245,7 +253,7 @@ class UserResource extends Resource
                                         ->dehydrated(true), // Sempre envia o valor do campo, mesmo vazio
 
 
-                                    Forms\Components\Hidden::make('role')
+                                    Hidden::make('role')
                                         ->label('Perfil')
 //                                        ->relationship('roles', 'name',
 //                                            fn(Builder $query) => auth()->user()->hasRole(['Admin', 'Super_admin']) ? null :
@@ -259,26 +267,26 @@ class UserResource extends Resource
                             ]), //fecha step 4
                             Wizard\Step::make('Associados') //passo 5
                                 ->schema([
-                                Forms\Components\Fieldset::make('Informações sobre o Associado')
+                                Fieldset::make('Informações sobre o Associado')
                                     ->relationship('associate', 'associate')
                                     ->schema([
-                                        Forms\Components\TextInput::make('enrollment')
+                                        TextInput::make('enrollment')
                                             ->label('Matrícula')
                                             ->required()
                                             ->maxLength(255),
 
-                                        Forms\Components\Select::make('associated_type_id')
+                                        Select::make('associated_type_id')
                                             ->label('Tipo de Membro')
                                             ->relationship('associated_type', 'name')
                                             ->required()
                                             ->preload(),
 
-                                        Forms\Components\Select::make('position_id')
+                                        Select::make('position_id')
                                             ->label('Cargo')
                                             ->required()
                                             ->relationship('position', 'name'),
 
-                                        Forms\Components\DatePicker::make('association_date')
+                                        DatePicker::make('association_date')
                                             ->label('Data de Associação')
                                             ->required(),
 
@@ -313,10 +321,10 @@ class UserResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('name')
+                TextColumn::make('name')
                     ->searchable()
                     ->label('Nome'),
-                Tables\Columns\TextColumn::make('document')
+                TextColumn::make('document')
                     ->label('CPF')
                     ->searchable()
                     ->formatStateUsing(fn ($state) =>
@@ -325,19 +333,19 @@ class UserResource extends Resource
                         substr($state, 6, 3) . '-' .
                         substr($state, 9, 2)
                     ),
-                Tables\Columns\TextColumn::make('email')
+                TextColumn::make('email')
                     ->searchable()
                     ->copyable(),
-                Tables\Columns\TextColumn::make('gender')
+                TextColumn::make('gender')
                     ->searchable()
                     ->label('Gênero')
                     ->toggleable(isToggledHiddenByDefault: true),
-                Tables\Columns\TextColumn::make('birth_date')
+                TextColumn::make('birth_date')
                     ->date()
                     ->label('Data de Nascimento')
                     ->date('d/m/Y')
                     ->sortable(),
-                Tables\Columns\TextColumn::make('phone.number')
+                TextColumn::make('phone.number')
                     ->icon('fas-square-phone') // Ícone do Heroicons
                     ->color('success') // Cor opcional para destacar o ícone
                     ->label('Telefone')
@@ -349,10 +357,14 @@ class UserResource extends Resource
                         : null
                     )
                     ->openUrlInNewTab(),
-                Tables\Columns\IconColumn::make('associate.is_active')
+                IconColumn::make('associate.is_active')
                     ->label('Ativo?')
                     ->boolean(),
-                Tables\Columns\TextColumn::make('blood_type')
+                Tables\Columns\TextColumn::make('roles.name')
+                    ->searchable()
+                    ->label('Perfil')
+                ,
+                TextColumn::make('blood_type')
                     ->label('Tipo Sanguíneo')
                     ->searchable()
                     ->badge()
@@ -368,24 +380,24 @@ class UserResource extends Resource
                         default => 'secondary', // Cor padrão caso o valor não corresponda
                     })
                     ->toggleable(isToggledHiddenByDefault: true),
-                Tables\Columns\TextColumn::make('marital_status')
+                TextColumn::make('marital_status')
                     ->label('Estado Civil')
                     ->searchable()
                     ->toggleable(isToggledHiddenByDefault: true),
-                Tables\Columns\TextColumn::make('education_level')
+                TextColumn::make('education_level')
                     ->label('Escolaridade')
                     ->searchable()
                     ->toggleable(isToggledHiddenByDefault: true)
                     ->label('Escolaridade'),
-                Tables\Columns\TextColumn::make('email_verified_at')
+                TextColumn::make('email_verified_at')
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
-                Tables\Columns\TextColumn::make('created_at')
+                TextColumn::make('created_at')
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
-                Tables\Columns\TextColumn::make('updated_at')
+                TextColumn::make('updated_at')
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
