@@ -61,6 +61,11 @@ class RolesAndPermitionSeeder extends Seeder
         Permission::create(['name' => 'meeting_update', 'guard_name' => 'web']);
         Permission::create(['name' => 'meeting_delete', 'guard_name' => 'web']);
 
+        Permission::create(['name' => 'agreement_read', 'guard_name' => 'web']);
+        Permission::create(['name' => 'agreement_create', 'guard_name' => 'web']);
+        Permission::create(['name' => 'agreement_update', 'guard_name' => 'web']);
+        Permission::create(['name' => 'agreement_delete', 'guard_name' => 'web']);
+
 
         // update cache to know about the newly created permissions (required if using WithoutModelEvents in seeders)
         app()[\Spatie\Permission\PermissionRegistrar::class]->forgetCachedPermissions();
@@ -71,7 +76,8 @@ class RolesAndPermitionSeeder extends Seeder
                 'user_read', 'user_create', 'user_update', 'user_delete',
                 'employee_read', 'employee_create', 'employee_update', 'employee_delete',
                 'associate_read', 'associate_create', 'associate_update', 'associate_delete',
-                'meeting_read', 'meeting_create', 'meeting_update', 'meeting_delete');
+                'meeting_read', 'meeting_create', 'meeting_update', 'meeting_delete',
+                'agreement_read', 'agreement_create', 'agreement_update', 'agreement_delete');
 
 
         // role Associate
@@ -84,7 +90,8 @@ class RolesAndPermitionSeeder extends Seeder
                 'user_read', 'user_create', 'user_update', 'user_delete',
                 'employee_read', 'employee_create', 'employee_update', 'employee_delete',
                 'associate_read', 'associate_create', 'associate_update', 'associate_delete',
-                'meeting_read', 'meeting_create', 'meeting_update', 'meeting_delete');
+                'meeting_read', 'meeting_create', 'meeting_update', 'meeting_delete',
+                'agreement_read', 'agreement_create', 'agreement_update', 'agreement_delete');
 
         //role Super_admin
         $role = Role::create(['name' => 'Super_admin', 'guard_name' => 'web']);

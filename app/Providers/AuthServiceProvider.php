@@ -3,12 +3,14 @@
 namespace App\Providers;
 
 // use Illuminate\Support\Facades\Gate;
+use App\Models\Agreements;
 use App\Models\Associate;
 use App\Models\Employee;
 use App\Models\Meeting;
 use App\Models\Permission;
 use App\Models\Role;
 use App\Models\User;
+use App\Policies\AgreementPolicy;
 use App\Policies\AssociatePolicy;
 use App\Policies\EmployeePolicy;
 use App\Policies\MeetingPolicy;
@@ -31,7 +33,8 @@ class AuthServiceProvider extends ServiceProvider
         Role::class => RolePolicy::class,
         Associate::class => AssociatePolicy::class,
         Employee::class => EmployeePolicy::class,
-        Meeting::class => MeetingPolicy::class
+        Meeting::class => MeetingPolicy::class,
+        Agreements::class => AgreementPolicy::class,
     ];
 
     /**

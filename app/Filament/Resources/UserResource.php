@@ -472,7 +472,8 @@ class UserResource extends Resource
     public static function getRelations(): array
     {
         return [
-            RelationManagers\DependantsRelationManager::make()
+            RelationManagers\DependantsRelationManager::make(),
+            RelationManagers\AgreementsRelationManager::make(),
         ];
     }
 

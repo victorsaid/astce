@@ -14,6 +14,7 @@ class DependantsRelationManager extends RelationManager
 {
     protected static string $relationship = 'dependants';
     protected static ?string $title = 'Dependentes';
+    protected static ?string $icon = 'fas-children';
     protected static ? string $modelLabel = 'Dependente';
     protected static ? string $pluralModelLabel = 'Dependentes';
 

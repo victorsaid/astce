@@ -57,7 +57,7 @@ class User extends Authenticatable implements FilamentUser
 
     public function agreements()
     {
-        return $this->belongsToMany(Agreements::class, 'agreement_user');
+        return $this->belongsToMany(Agreements::class, 'agreement_user', 'user_id', 'agreement_id');
     }
 
     public function associate()

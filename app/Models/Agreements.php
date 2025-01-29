@@ -24,6 +24,6 @@ class Agreements extends Model
 
     public function users()
     {
-        return $this->belongsToMany(User::class, 'agreement_user');
+        return $this->belongsToMany(User::class, 'agreement_user', 'agreement_id', 'user_id');
     }
 }
