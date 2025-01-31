@@ -40,8 +40,19 @@ class AgreementsRelationManager extends RelationManager
     {
         return $table
             ->columns([
+                Tables\Columns\ImageColumn::make('photo')
+                    ->label('Foto')
+                    ->sortable(),
                 Tables\Columns\TextColumn::make('name')
                     ->label('Nome do Convênio')
+                    ->sortable()
+                    ->searchable(),
+                Tables\Columns\TextColumn::make('description')
+                    ->label('Descrição')
+                    ->sortable()
+                    ->searchable(),
+                Tables\Columns\TextColumn::make('site')
+                    ->label('Site')
                     ->sortable()
                     ->searchable(),
 
@@ -57,9 +68,11 @@ class AgreementsRelationManager extends RelationManager
             ])
             ->headerActions([
                 AttachAction::make()
+                    ->multiple()
                     ->label('Selecionar Convênio')
                     ->preloadRecordSelect() // Carrega os convênios no select ao abrir o modal
-                    ->recordSelectOptionsQuery(fn (Builder $query) => $query->where('is_active', true))
+                    ->recordSelectSearchColumns(['name', 'description'])
+                    //->recordSelectOptionsQuery(fn (Builder $query) => $query->where('is_active', true))
                     ->recordTitle(fn (Agreements $record) => $record->name),
             ])
             ->actions([

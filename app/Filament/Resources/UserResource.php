@@ -16,7 +16,9 @@ use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Filament\Forms\Components\Wizard;
+use Hamcrest\Core\Set;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Illuminate\Http\Client\RequestException;
 use Illuminate\Support\Facades\Http;
@@ -36,6 +38,7 @@ use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\Hidden;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
+use Closure;
 
 
 
@@ -59,7 +62,7 @@ class UserResource extends Resource
                         // Passo 1: Informações Pessoais
                         Wizard\Step::make('Informações Pessoais')
                             ->schema([
-                                Grid::make(3) // Dividindo em 2 colunas para melhorar layout
+                                Grid::make(12) // Dividindo em 2 colunas para melhorar layout
                                 ->schema([
                                     FileUpload::make('photo')
                                         ->label('Foto')
@@ -67,21 +70,90 @@ class UserResource extends Resource
                                         ->avatar()
                                         ->directory('profile_photos')
                                         ->preserveFilenames()
-                                        ->disk('public'),
+                                        ->disk('public')
+                                        ->columnSpan(2),
                                     TextInput::make('document')
                                         ->label('CPF')
+                                        ->columnSpan(2)
                                         ->placeholder('000.000.000-00')
                                         ->required()
                                         ->mask('999.999.999-99') // Máscara para CPF
                                         ->dehydrated(true) // Sempre envia o valor do campo, mesmo vazio
+                                        ->suffixAction(
+                                            Action::make('search')
+                                                ->icon('heroicon-o-magnifying-glass')
+                                                ->action(function (Forms\Set $set, $state, Forms\Get $get, $livewire) {
+                                                    if (blank($state)) {
+                                                        Notification::make()
+                                                            ->title('Digite o CPF para buscar')
+                                                            ->danger()->send();
+                                                        return;
+                                                    }else{
+                                                        $cpfSanitizado = preg_replace('/[^0-9]/', '', $state);
+                                                        $userData = User::where('document', $cpfSanitizado)->first();
+                                                        if ($userData && $userData->associate) {
+                                                            // 🔴 Exibe erro no campo CPF
+                                                            $livewire->addError('document', 'Este CPF já está sendo usado por um associado.');
+
+                                                            // 🔴 Limpa o campo CPF para evitar continuação do cadastro
+                                                            $set('document', '');
+
+                                                            // 🔴 Envia notificação de erro
+                                                            Notification::make()
+                                                                ->title('CPF já está sendo usado por um associado')
+                                                                ->danger()
+                                                                ->send();
+
+                                                            return;
+                                                        }
+                                                    }
+                                                    try {
+                                                        $cpfSanitizado = preg_replace('/[^0-9]/', '', $state);
+                                                        $userData = User::where('document', $cpfSanitizado)->firstOrFail();
+                                                        $set('name', $userData->name ?? '');
+                                                        $set('gender', $userData->gender ?? '');
+                                                        $set('birth_date', $userData->birth_date?? '');
+                                                        $set('blood_type', $userData->blood_type ?? '');
+                                                        $set('marital_status', $userData->marital_status ?? '');
+                                                        $set('education_level', $userData->education_level?? '');
+                                                        $set('email', $userData->email ?? '');
+                                                        $firstPhone = $userData->phone ? $userData->phone->first() : null;
+                                                        ///seta os contatos
+                                                        $set('contacts', $firstPhone ? [
+                                                            [
+                                                                'number' => $firstPhone->number,
+                                                                'type' => $firstPhone->type,
+                                                                'observation' => $firstPhone->observation,
+                                                            ]
+                                                        ]: []);
+                                                        // seta o endereço
+                                                        $set('address', [
+                                                            'zip_code' => $userData->address->zip_code,
+                                                            'state' => $userData->address->state,
+                                                            'city' => $userData->address->city,
+                                                            'neighborhood' => $userData->address->neighborhood,
+                                                            'street' => $userData->address->street,
+                                                            'number' => $userData->address->number,
+                                                            'complement' => $userData->address->complement,
+                                                        ]);
+
+                                                    }catch (ModelNotFoundException $e){
+                                                        Notification::make()
+                                                            ->title('CPF não encontrado')
+                                                            ->danger()->send();
+                                                    }
+                                                })
+                                        )
                                     ,
                                     TextInput::make('name')
                                         ->label('Nome Completo')
+                                        ->columnSpan(4)
                                         ->required()
                                         ->maxLength(255),
                                     Select::make('gender')
                                         ->label('Gênero')
                                         ->required()
+                                        ->columnSpan(2)
                                         ->options([
                                             'masculino' => 'Masculino',
                                             'feminino' => 'Feminino',
@@ -90,10 +162,12 @@ class UserResource extends Resource
                                         ]),
                                     DatePicker::make('birth_date')
                                         ->label('Data de Nascimento')
+                                        ->columnSpan(2)
                                         ->date('d/m/Y')
                                         ->required(),
                                     Select::make('blood_type')
                                         ->label('Tipo Sanguíneo')
+                                        ->columnSpan(2)
                                         ->options([
                                             'A+' => 'A+',
                                             'A-' => 'A-',
@@ -106,6 +180,7 @@ class UserResource extends Resource
                                         ]),
                                     Select::make('marital_status')
                                         ->label('Estado Civil')
+                                        ->columnSpan(2)
                                         ->required()
                                         ->options([
                                             'solteiro' => 'Solteiro(a)',
@@ -116,6 +191,7 @@ class UserResource extends Resource
                                         ]),
                                     Select::make('education_level')
                                         ->required()
+                                        ->columnSpan(2)
                                         ->label('Nível de Escolaridade')
                                         ->options([
                                             'fundamental' => 'Fundamental',
@@ -267,31 +343,38 @@ class UserResource extends Resource
                             ]), //fecha step 4
                             Wizard\Step::make('Associados') //passo 5
                                 ->schema([
-                                Fieldset::make('Informações sobre o Associado')
+                                    Fieldset::make('Informações sobre o Associado')
                                     ->relationship('associate', 'associate')
                                     ->schema([
                                         TextInput::make('enrollment')
                                             ->label('Matrícula')
                                             ->required()
-                                            ->maxLength(255),
+                                            ->maxLength(255)
+                                            ->columnSpan(1),
 
                                         Select::make('associated_type_id')
                                             ->label('Tipo de Membro')
                                             ->relationship('associated_type', 'name')
                                             ->required()
-                                            ->preload(),
+                                            ->preload()
+                                            ->columnSpan(1),
 
                                         Select::make('position_id')
                                             ->label('Cargo')
                                             ->required()
-                                            ->relationship('position', 'name'),
+                                            ->relationship('position', 'name')
+                                            ->columnSpan(1),
 
                                         DatePicker::make('association_date')
                                             ->label('Data de Associação')
-                                            ->required(),
+                                            ->required()
+                                            ->date('d/m/Y')
+                                            ->columnSpan(1),
 
                                         Forms\Components\ToggleButtons::make('is_active')
                                             ->label('Associado Ativo?')
+                                            ->required()
+                                            ->columnSpan(1)
                                             ->default(true)
                                             ->inline()
                                             ->options([
@@ -305,12 +388,25 @@ class UserResource extends Resource
                                             ->colors([
                                                 '0' => 'danger',
                                                 '1' => 'success',
-                                            ])
-                                        ,
+                                            ]),
+
+                                    ])->columns(4),
+                                    Fieldset::make('Convênios do Associado')
+                                    ->schema([
+                                        Select::make('agreements')
+                                            ->label('Convênios Disponíveis')
+
+                                            ->relationship('agreements', 'name')
+                                            ->multiple()
+                                            ->preload()
+                                            ->searchable()
+                                            ->options(
+                                                fn () => \App\Models\Agreements::where('is_active', true)->pluck('name', 'id')->toArray()
+                                            ),
 
                                     ]),
-                                ]),
-                    ]), //fecha wizard
+                                ]) ,
+                    ])->startOnStep(5), //fecha wizard
 
                 ]),  //fecha grid
             ]); //fecha schema do form
