@@ -41,6 +41,9 @@ class CreateUser extends CreateRecord
                 'gender' => $data['gender'] ?? $existingUser->gender,
                 'birth_date' => $data['birth_date'] ?? $existingUser->birth_date,
                 'marital_status' => $data['marital_status'] ?? $existingUser->marital_status,
+                'education_level' => $data['education_level'] ?? $existingUser->education_level,
+                'photo' => $data['photo'] ?? $existingUser->photo,
+
             ]);
 
             // Atualizar ou criar informações de associado

@@ -74,6 +74,29 @@ class UserResource extends Resource
                                         ->columnSpan(2),
                                     TextInput::make('document')
                                         ->label('CPF')
+                                        ->rule(function (Forms\Get $get) {
+                                            return function (string $attribute, $value, \Closure $fail) use ($get) {
+                                                // 🔹 Remove pontuações do CPF
+                                                $cpfSanitizado = preg_replace('/[^0-9]/', '', $value);
+
+                                                // 🔍 Obtém o ID do registro sendo editado (se houver)
+                                                $recordId = $get('id'); // Obtém o ID no contexto do Filament
+
+                                                // 🚨 Se estamos editando, não aplicamos a validação
+                                                if (!empty($recordId)) {
+                                                    return;
+                                                }
+
+                                                // 🚨 Apenas faz a validação se estivermos na criação
+                                                $isAssociate = User::where('document', $cpfSanitizado)
+                                                    ->whereHas('associate')
+                                                    ->exists();
+
+                                                if ($isAssociate) {
+                                                    $fail('Este CPF já está sendo usado por um associado.');
+                                                }
+                                            };
+                                        })
                                         ->columnSpan(2)
                                         ->placeholder('000.000.000-00')
                                         ->required()
