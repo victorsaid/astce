@@ -21,6 +21,7 @@ use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Illuminate\Support\Facades\Http;
 use Filament\Forms\Components\Wizard;
@@ -59,7 +60,94 @@ class EmployeeResource extends Resource
                                         ->required()
                                         ->mask('999.999.999-99') // Máscara para CPF
                                         ->dehydrated(true) // Sempre envia o valor do campo, mesmo vazio
-                                    ,
+                                        ->rule(function (Forms\Get $get) {
+                                            return function (string $attribute, $value, \Closure $fail) use ($get) {
+                                                // 🔹 Remove pontuações do CPF
+                                                $cpfSanitizado = preg_replace('/[^0-9]/', '', $value);
+
+                                                // 🔍 Obtém o ID do registro sendo editado (se houver)
+                                                $recordId = $get('id'); // Obtém o ID no contexto do Filament
+
+                                                // 🚨 Se estamos editando, não aplicamos a validação
+                                                if (!empty($recordId)) {
+                                                    return;
+                                                }
+
+                                                // 🚨 Apenas faz a validação se estivermos na criação
+                                                $isAssociate = User::where('document', $cpfSanitizado)
+                                                    ->whereHas('employee')
+                                                    ->exists();
+
+                                                if ($isAssociate) {
+                                                    $fail('Este CPF já está sendo usado por um funcionario.');
+                                                }
+                                            };
+                                        })
+                                        ->suffixAction(
+                                            Action::make('search')
+                                                ->icon('heroicon-o-magnifying-glass')
+                                                ->action(function (Forms\Set $set, $state, Forms\Get $get, $livewire) {
+                                                    if (blank($state)) {
+                                                        Notification::make()
+                                                            ->title('Digite o CPF para buscar')
+                                                            ->danger()->send();
+                                                        return;
+                                                    }else{
+                                                        $cpfSanitizado = preg_replace('/[^0-9]/', '', $state);
+                                                        $userData = User::where('document', $cpfSanitizado)->first();
+                                                        if ($userData && $userData->employee) {
+                                                            // 🔴 Exibe erro no campo CPF
+                                                            $livewire->addError('document', 'Este CPF já está sendo usado por um associado.');
+
+                                                            // 🔴 Limpa o campo CPF para evitar continuação do cadastro
+                                                            $set('document', '');
+
+                                                            // 🔴 Envia notificação de erro
+                                                            Notification::make()
+                                                                ->title('CPF já está sendo usado por um funcionário')
+                                                                ->danger()
+                                                                ->send();
+
+                                                            return;
+                                                        }
+                                                    }
+                                                    try {
+                                                        $cpfSanitizado = preg_replace('/[^0-9]/', '', $state);
+                                                        $userData = User::where('document', $cpfSanitizado)->firstOrFail();
+                                                        $set('name', $userData->name ?? '');
+                                                        $set('gender', $userData->gender ?? '');
+                                                        $set('birth_date', $userData->birth_date?? '');
+                                                        $set('blood_type', $userData->blood_type ?? '');
+                                                        $set('marital_status', $userData->marital_status ?? '');
+                                                        $set('education_level', $userData->education_level?? '');
+                                                        $set('email', $userData->email ?? '');
+                                                        $firstPhone = $userData->phone ? $userData->phone->first() : null;
+                                                        ///seta os contatos
+                                                        $set('contacts', $firstPhone ? [
+                                                            [
+                                                                'number' => $firstPhone->number,
+                                                                'type' => $firstPhone->type,
+                                                                'observation' => $firstPhone->observation,
+                                                            ]
+                                                        ]: []);
+                                                        // seta o endereço
+                                                        $set('address', [
+                                                            'zip_code' => $userData->address->zip_code,
+                                                            'state' => $userData->address->state,
+                                                            'city' => $userData->address->city,
+                                                            'neighborhood' => $userData->address->neighborhood,
+                                                            'street' => $userData->address->street,
+                                                            'number' => $userData->address->number,
+                                                            'complement' => $userData->address->complement,
+                                                        ]);
+
+                                                    }catch (ModelNotFoundException $e){
+                                                        Notification::make()
+                                                            ->title('CPF não encontrado')
+                                                            ->danger()->send();
+                                                    }
+                                                })
+                                        ),
                                     TextInput::make('name')
                                         ->label('Nome Completo')
                                         ->required()
@@ -261,8 +349,14 @@ class EmployeeResource extends Resource
                                     TextInput::make('salary')
                                         ->label('Salário')
                                         ->required()
-                                        ->prefix('R$') // Adiciona o prefixo para o símbolo da moeda
-                                        ->numeric(), // Garante que apenas valores numéricos sejam aceitos
+                                        ->prefix('R$') // Exibe o símbolo da moeda
+                                        ->numeric() // Garante que apenas números sejam aceitos
+                                        ->default(0.00) // Define um valor padrão inicial
+                                        ->suffix(',00') // Para manter o formato de decimal padrão no Brasil
+                                        ->rule('regex:/^\d+(\,\d{1,2})?$/') // Aceita valores com duas casas decimais separados por vírgula
+                                        ->formatStateUsing(fn ($state) => number_format($state, 2, ',', '.')) // Formata corretamente a exibição
+                                        ->dehydrateStateUsing(fn ($state) => str_replace(',', '.', $state)) // Adiciona separador de milhares como ponto
+                                        ,
 
                                     Forms\Components\ToggleButtons::make('is_active')
                                         ->label('Funcionário Ativo?')
@@ -298,8 +392,14 @@ class EmployeeResource extends Resource
                     ->searchable()
                     ->label('Nome'),
                 Tables\Columns\TextColumn::make('document')
+                    ->label('CPF')
                     ->searchable()
-                    ->label('CPF'),
+                    ->formatStateUsing(fn ($state) =>
+                        substr($state, 0, 3) . '.' .
+                        substr($state, 3, 3) . '.' .
+                        substr($state, 6, 3) . '-' .
+                        substr($state, 9, 2)
+                    ),
                 Tables\Columns\TextColumn::make('email')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('gender')

@@ -429,7 +429,7 @@ class UserResource extends Resource
 
                                     ]),
                                 ]) ,
-                    ])->startOnStep(5), //fecha wizard
+                    ]), //fecha wizard
 
                 ]),  //fecha grid
             ]); //fecha schema do form
@@ -522,8 +522,9 @@ class UserResource extends Resource
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
-                //
-            ])
+
+
+            ],layout: Tables\Enums\FiltersLayout::AboveContent)
             ->actions([
                 //Tables\Actions\ViewAction::make(),
                 Tables\Actions\EditAction::make(),
@@ -583,7 +584,9 @@ class UserResource extends Resource
                                 ->send();
                         })
                         ->requiresConfirmation(),
-                    Tables\Actions\DeleteBulkAction::make(),
+                    Tables\Actions\DeleteBulkAction::make()
+                    ->label('Excluir Registros Selecionados')
+                    ,
                 ]),
             ]);
     }
@@ -611,7 +614,7 @@ class UserResource extends Resource
         return auth()->user()->hasRole(['admin', 'Super_admin'])
             ? parent::getEloquentQuery()->whereHas('associate')
             : parent::getEloquentQuery()
-                ->whereHas('employee') // Filtra apenas usuários que têm relação com employee
+                ->whereHas('associate') // Filtra apenas usuários que têm relação com employee
                 ->whereHas('roles', fn($query) => $query->whereNotIn('name', ['Admin', 'Super_admin']));
     }
 
