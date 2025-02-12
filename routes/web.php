@@ -14,8 +14,11 @@ use Barryvdh\DomPDF\Facade\Pdf;
 |
 */
 
+//Route::get('/', function () {
+//    return view('welcome');
+//});
 Route::get('/', function () {
-    return view('welcome');
+    return redirect()->route('filament.admin.auth.login');
 });
 
 Route::get('/pdf/meetings/{user}', [\App\Http\Controllers\PdfController::class, 'pdfMeetings'])->name('pdf.example');

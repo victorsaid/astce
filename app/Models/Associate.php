@@ -40,4 +40,9 @@ class Associate extends Model
         return $this->hasMany(Dependant::class);
     }
 
+    public function associationPeriods()
+    {
+        return $this->hasMany(AssociationPeriod::class);
+    }
+
 }

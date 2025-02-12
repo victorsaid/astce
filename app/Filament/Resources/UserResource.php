@@ -388,12 +388,6 @@ class UserResource extends Resource
                                             ->relationship('position', 'name')
                                             ->columnSpan(1),
 
-                                        DatePicker::make('association_date')
-                                            ->label('Data de Associação')
-                                            ->required()
-                                            ->date('d/m/Y')
-                                            ->columnSpan(1),
-
                                         Forms\Components\ToggleButtons::make('is_active')
                                             ->label('Associado Ativo?')
                                             ->required()
@@ -412,24 +406,33 @@ class UserResource extends Resource
                                                 '0' => 'danger',
                                                 '1' => 'success',
                                             ]),
+                                        Repeater::make('associationPeriods')
+                                            ->label('Tempo de Associado')
+                                            ->relationship('associationPeriods') // Define o relacionamento
+                                            ->schema([
+                                                DatePicker::make('start_date')
+                                                    ->label('Data de Início')
+                                                    ->required(),
+
+                                                DatePicker::make('end_date')
+                                                    ->label('Data de Término')
+                                                    ->nullable(),
+                                            ])->columnSpan(2)->columns(2),
 
                                     ])->columns(4),
-                                    Fieldset::make('Convênios do Associado')
+
+                                Fieldset::make('Convênios do Associado')
                                     ->schema([
                                         Select::make('agreements')
-                                            ->label('Convênios Disponíveis')
-
-                                            ->relationship('agreements', 'name')
-                                            ->multiple()
+                                            ->label('Convênios')
+                                            ->multiple() // Permite selecionar vários convênios
+                                            ->relationship('agreements', 'name') // Apenas relaciona sem criar novos registros
                                             ->preload()
                                             ->searchable()
-                                            ->options(
-                                                fn () => \App\Models\Agreements::where('is_active', true)->pluck('name', 'id')->toArray()
-                                            ),
-
-                                    ]),
+                                            ->required(),
+                                    ])
                                 ]) ,
-                    ]), //fecha wizard
+                    ])->startOnStep(1), //fecha wizard
 
                 ]),  //fecha grid
             ]); //fecha schema do form

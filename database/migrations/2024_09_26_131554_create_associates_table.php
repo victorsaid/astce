@@ -17,7 +17,7 @@ return new class extends Migration
             $table->foreignId('associated_type_id')->constrained();
             $table->foreignId('position_id')->constrained()->onDelete('cascade');
             $table->string('enrollment');
-            $table->date('association_date');
+            //$table->date('association_date');
             $table->boolean('is_active')->default(true);
             $table->timestamps();
         });
