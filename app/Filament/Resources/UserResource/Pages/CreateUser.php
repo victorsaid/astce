@@ -42,6 +42,7 @@ class CreateUser extends CreateRecord
                 'birth_date' => $data['birth_date'] ?? $existingUser->birth_date,
                 'marital_status' => $data['marital_status'] ?? $existingUser->marital_status,
                 'education_level' => $data['education_level'] ?? $existingUser->education_level,
+                'blood_type' => $data['blood_type'] ?? $existingUser->blood_type,
                 'photo' => $data['photo'] ?? $existingUser->photo,
 
             ]);

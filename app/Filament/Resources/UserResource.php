@@ -484,26 +484,10 @@ class UserResource extends Resource
                 IconColumn::make('associate.is_active')
                     ->label('Ativo?')
                     ->boolean(),
-                Tables\Columns\TextColumn::make('roles.name')
-                    ->searchable()
-                    ->label('Perfil')
-                ,
-                TextColumn::make('blood_type')
-                    ->label('Tipo Sanguíneo')
-                    ->searchable()
-                    ->badge()
-                    ->color(fn ($state) => match ($state) {
-                        'A+' => 'success',
-                        'A-' => 'danger',
-                        'B+' => 'info',
-                        'B-' => 'warning',
-                        'AB+' => 'primary',
-                        'AB-' => 'gray',
-                        'O+' => 'success',
-                        'O-' => 'danger',
-                        default => 'secondary', // Cor padrão caso o valor não corresponda
-                    })
-                    ->toggleable(isToggledHiddenByDefault: true),
+//                Tables\Columns\TextColumn::make('roles.name')
+//                    ->searchable()
+//                    ->label('Perfil')
+//                ,
                 TextColumn::make('marital_status')
                     ->label('Estado Civil')
                     ->searchable()
