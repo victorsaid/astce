@@ -44,7 +44,6 @@ class AgreementsResource extends Resource
                     ->maxLength(255),
 
                 Forms\Components\TextInput::make('site')
-                    ->required()
                     ->prefix('https://')
                     ->label('Site')
                     ->maxLength(255),

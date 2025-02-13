@@ -27,6 +27,7 @@ class DatabaseSeeder extends Seeder
             PositionSeeder::class,
             RolesAndPermitionSeeder::class,
             AssociatedTypes::class,
+            AgreementSeeder::class,
         ]);
     }
 }

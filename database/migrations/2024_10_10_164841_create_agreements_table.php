@@ -16,7 +16,7 @@ return new class extends Migration
             $table->string('name');
             $table->string('description');
             $table->json('photo')->nullable();
-            $table->string('site');
+            $table->string('site')->nullable();
             $table->string('type');
             $table->boolean('is_active')->default(true);
             $table->timestamps();
