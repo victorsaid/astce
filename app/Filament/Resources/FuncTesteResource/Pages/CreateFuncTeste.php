@@ -25,7 +25,7 @@ class CreateFuncTeste extends CreateRecord
         return $data;
     }
 
-    protected function handleRecordCreation(array $data): \App\Models\User
+    protected function handleRecordCreation(array $data): \Illuminate\Database\Eloquent\Model
     {
         // Verificar se o CPF já existe no banco de dados
         $existingUser = \App\Models\User::where('document', $data['document'])->first();
@@ -38,6 +38,10 @@ class CreateFuncTeste extends CreateRecord
                 'gender' => $data['gender'] ?? $existingUser->gender,
                 'birth_date' => $data['birth_date'] ?? $existingUser->birth_date,
                 'marital_status' => $data['marital_status'] ?? $existingUser->marital_status,
+                'education_level' => $data['education_level'] ?? $existingUser->education_level,
+                'blood_type' => $data['blood_type'] ?? $existingUser->blood_type,
+                'photo' => $data['photo'] ?? $existingUser->photo,
+
             ]);
 
             // Atualizar ou criar informações de associado

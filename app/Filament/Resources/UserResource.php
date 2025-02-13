@@ -450,6 +450,7 @@ class UserResource extends Resource
                     ->label('Nome'),
                 TextColumn::make('document')
                     ->label('CPF')
+                    ->copyable()
                     ->searchable()
                     ->formatStateUsing(fn ($state) =>
                         substr($state, 0, 3) . '.' .

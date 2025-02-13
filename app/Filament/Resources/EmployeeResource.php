@@ -345,6 +345,7 @@ class EmployeeResource extends Resource
                                 ->schema([
                                     DatePicker::make('hire_date')
                                         ->label('Data de Contratação')
+                                        ->date('d/m/Y')
                                         ->required(),
                                     TextInput::make('salary')
                                         ->label('Salário')
@@ -352,10 +353,7 @@ class EmployeeResource extends Resource
                                         ->prefix('R$') // Exibe o símbolo da moeda
                                         ->numeric() // Garante que apenas números sejam aceitos
                                         ->default(0.00) // Define um valor padrão inicial
-                                        ->suffix(',00') // Para manter o formato de decimal padrão no Brasil
-                                        ->rule('regex:/^\d+(\,\d{1,2})?$/') // Aceita valores com duas casas decimais separados por vírgula
-                                        ->formatStateUsing(fn ($state) => number_format($state, 2, ',', '.')) // Formata corretamente a exibição
-                                        ->dehydrateStateUsing(fn ($state) => str_replace(',', '.', $state)) // Adiciona separador de milhares como ponto
+
                                         ,
 
                                     Forms\Components\ToggleButtons::make('is_active')
@@ -394,6 +392,7 @@ class EmployeeResource extends Resource
                 Tables\Columns\TextColumn::make('document')
                     ->label('CPF')
                     ->searchable()
+                    ->copyable()
                     ->formatStateUsing(fn ($state) =>
                         substr($state, 0, 3) . '.' .
                         substr($state, 3, 3) . '.' .
@@ -401,7 +400,8 @@ class EmployeeResource extends Resource
                         substr($state, 9, 2)
                     ),
                 Tables\Columns\TextColumn::make('email')
-                    ->searchable(),
+                    ->searchable()
+                    ->copyable(),
                 Tables\Columns\TextColumn::make('gender')
                     ->searchable()
                     ->label('Gênero')
@@ -423,22 +423,6 @@ class EmployeeResource extends Resource
                         : null
                     )
                     ->openUrlInNewTab(),
-                Tables\Columns\TextColumn::make('blood_type')
-                    ->label('Tipo Sanguíneo')
-                    ->searchable()
-                    ->badge()
-                    ->color(fn ($state) => match ($state) {
-                        'A+' => 'success',
-                        'A-' => 'danger',
-                        'B+' => 'info',
-                        'B-' => 'warning',
-                        'AB+' => 'primary',
-                        'AB-' => 'gray',
-                        'O+' => 'success',
-                        'O-' => 'danger',
-                        default => 'secondary', // Cor padrão caso o valor não corresponda
-                    })
-                    ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('marital_status')
                     ->label('Estado Civil')
                     ->searchable()
@@ -448,10 +432,10 @@ class EmployeeResource extends Resource
                     ->searchable()
                     ->toggleable(isToggledHiddenByDefault: true)
                     ->label('Escolaridade'),
-                Tables\Columns\TextColumn::make('roles.name')
-                    ->searchable()
-                    ->label('Perfil')
-                ,
+//                Tables\Columns\TextColumn::make('roles.name')
+//                    ->searchable()
+//                    ->label('Perfil')
+//                ,
                 Tables\Columns\TextColumn::make('email_verified_at')
                     ->dateTime()
                     ->sortable()

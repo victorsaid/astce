@@ -24,7 +24,7 @@
 </head>
 <body>
 <div style="text-align: center; margin-bottom: 20px;">
-    <img src="{{ base_path('public/storage/logo/Logoastce.png') }}"
+    <img src="{{ base_path('public/storage/logo/logo_astce.jpeg') }}"
          style="width: 150px; height: auto;"
          alt="Logo">
 </div>

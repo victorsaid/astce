@@ -31,6 +31,10 @@ class EditFuncTeste extends EditRecord
                 'gender' => $data['gender'] ?? $record->gender,
                 'birth_date' => $data['birth_date'] ?? $record->birth_date,
                 'marital_status' => $data['marital_status'] ?? $record->marital_status,
+                'education_level' => $data['education_level'] ?? $record->education_level,
+                'photo' => $data['photo'] ?? $record->photo,
+                'blood_type' => $data['blood_type'] ?? $record->blood_type,
+
             ];
 
             // Atualizar a senha somente se fornecida
