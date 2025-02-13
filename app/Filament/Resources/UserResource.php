@@ -20,6 +20,7 @@ use Hamcrest\Core\Set;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Illuminate\Database\QueryException;
 use Illuminate\Http\Client\RequestException;
 use Illuminate\Support\Facades\Http;
 use Filament\Forms\Components\Tabs;
@@ -51,6 +52,7 @@ class UserResource extends Resource
     protected static ?string $slug = 'associados';
     protected static ?string $navigationGroup = 'Usuários';
     protected static ?string $navigationIcon = 'fas-user-tie';
+    protected static ?int $navigationSort = 1;
 
     public static function form(Form $form): Form
     {

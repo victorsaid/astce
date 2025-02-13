@@ -21,6 +21,7 @@ class AgreementsResource extends Resource
     protected static ?string $slug = 'convenios';
     protected static ?string $navigationGroup = 'Convênios';
     protected static ?string $navigationIcon = 'fas-tree-city';
+    protected static ?int $navigationSort = 2;
 
     public static function form(Form $form): Form
     {
