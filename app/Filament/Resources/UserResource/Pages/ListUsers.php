@@ -36,7 +36,7 @@ class ListUsers extends ListRecords
         return [
             Tab::make('all')
                 ->icon('fas-users')
-                ->badge(User::query()->whereHas('roles', fn($query) => $query->whereNotIn('name', ['Super_admin']))->count())
+                ->badge(User::query()->whereHas('roles', fn($query) => $query->whereNotIn('name', ['Super_admin', 'Admin', 'Employee']))->count())
             ->label('Todos'),
             Tab::make('male')
                 ->icon('fas-male')
