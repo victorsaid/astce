@@ -35,7 +35,7 @@ class DependantsRelationManager extends RelationManager
                         'Filho(a)' => 'Filho(a)',
                     ])
                 ,
-                Forms\Components\Datepicker::make('birth_date')
+                Forms\Components\DatePicker::make('birth_date')
                     ->required()
                     ->label('Data de Nascimento')
                     ->date('d/m/Y'),
