@@ -321,7 +321,7 @@ class EmployeeResource extends Resource
                                         ->label('Senha')
                                         ->password()
                                         ->maxLength(255)
-                                        ->dehydrateStateUsing(fn($state) => filled($state) ? bcrypt($state) : null) // Criptografa a senha somente se fornecida
+                                        //->dehydrateStateUsing(fn($state) => filled($state) ? bcrypt($state) : null) // Criptografa a senha somente se fornecida
                                         ->required(false) // Torna o campo não obrigatório
                                         ->dehydrated(true), // Sempre envia o valor do campo, mesmo vazio
 

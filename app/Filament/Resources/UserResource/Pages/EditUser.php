@@ -33,6 +33,7 @@ class EditUser extends EditRecord
 
             // Atualizar a senha somente se fornecida
             if (!empty($data['password'])) {
+                //dd($data['password']);
                 $updateData['password'] = bcrypt($data['password']);
             }
 
