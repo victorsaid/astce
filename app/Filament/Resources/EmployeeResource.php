@@ -23,6 +23,7 @@ use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Http;
 use Filament\Forms\Components\Wizard;
 
@@ -469,6 +470,12 @@ class EmployeeResource extends Resource
         ];
     }
 
+    //Oculta o resource de funcionário para um funcionário
+    public static function canAccess(): bool
+    {
+        return Auth::check() && (Auth::user()->roles->pluck('name')->diff(['Employee'])->isNotEmpty());
+    }
+
     public static function getPages(): array
     {
         return [
@@ -477,6 +484,7 @@ class EmployeeResource extends Resource
             'edit' => Pages\EditFuncTeste::route('/{record}/edit'),
         ];
     }
+
 
     public static function getEloquentQuery(): Builder
     {
