@@ -12,6 +12,7 @@ class Users extends BaseWidget
     protected static ?int $sort = 1;
     protected static ?string $heading = 'Últimos Associados';
 
+
     public function table(Table $table): Table
     {
         return $table
