@@ -40,7 +40,7 @@ class EditFuncTeste extends EditRecord
             // Atualizar a senha somente se fornecida
             if (!empty($data['password'])) {
 
-                $updateData['password'] = bcrypt($data['password']);dd($updateData['password']);
+                $updateData['password'] = bcrypt($data['password']);
             }
 
             $record->update($updateData);
