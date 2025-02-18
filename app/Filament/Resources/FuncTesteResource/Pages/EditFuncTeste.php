@@ -24,6 +24,7 @@ class EditFuncTeste extends EditRecord
             // Remova a formatação do CPF
             $data['document'] = str_replace(['.', '-'], '', $data['document']);
 
+
             // Atualize os dados do registro
             $updateData = [
                 'name' => $data['name'] ?? $record->name,
@@ -36,10 +37,10 @@ class EditFuncTeste extends EditRecord
                 'blood_type' => $data['blood_type'] ?? $record->blood_type,
 
             ];
-
             // Atualizar a senha somente se fornecida
             if (!empty($data['password'])) {
-                $updateData['password'] = bcrypt($data['password']);
+
+                $updateData['password'] = bcrypt($data['password']);dd($updateData['password']);
             }
 
             $record->update($updateData);
