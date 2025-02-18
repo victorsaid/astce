@@ -430,8 +430,7 @@ class UserResource extends Resource
                                             ->multiple() // Permite selecionar vários convênios
                                             ->relationship('agreements', 'name') // Apenas relaciona sem criar novos registros
                                             ->preload()
-                                            ->searchable()
-                                            ->required(),
+                                            ->searchable(),
                                     ])
                                 ]) ,
                     ])->startOnStep(1), //fecha wizard
