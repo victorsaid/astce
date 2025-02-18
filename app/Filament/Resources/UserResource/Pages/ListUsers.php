@@ -9,6 +9,7 @@ use Filament\Resources\Pages\ListRecords;
 use Illuminate\Database\Eloquent\Builder;
 use Filament\Resources\Components\Tab;
 use Illuminate\Support\Facades\Auth;
+use Filament\Actions\DropdownAction;
 
 class ListUsers extends ListRecords
 {
@@ -18,17 +19,26 @@ class ListUsers extends ListRecords
     {
         return [
             Actions\CreateAction::make()
-            ->color('success')
-            ->label('Adicionar Associado'),
+                ->color('success')
+                ->label('Adicionar Associado'),
 
-            Actions\Action::make('Exportar usuários')
-                ->label('Exportar Associados')
-                ->icon('fas-file-pdf')
-                ->color('danger')
-                ->requiresConfirmation()
-                ->url(
-                    fn(): string => route('pdf.users')
-                ),
+            Actions\ActionGroup::make([
+                Actions\Action::make('Exportar usuários')
+                    ->label('Exportar Associados')
+                    ->icon('fas-file-pdf')
+                    ->color('danger')
+                    ->requiresConfirmation()
+                    ->url(fn(): string => route('pdf.users')),
+
+//                Actions\Action::make('Outra Ação')
+//                    ->label('Outra ação aqui')
+//                    ->icon('fas-hamburger')
+//                    ->color('info')
+//                    ->action(fn() => dd('Executando ação!')),
+            ])
+                ->label('Mais Ações') // Nome do grupo de ações
+                ->icon('fas-ellipsis-vertical') // Ícone do botão
+                ->color('primary'), // Cor do botão principal
         ];
     }
     public function getTabs(): array

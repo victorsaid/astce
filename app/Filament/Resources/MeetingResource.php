@@ -22,10 +22,12 @@ class MeetingResource extends Resource
 {
     protected static ?string $model = Meeting::class;
 
-    protected static ?string $navigationIcon = 'fas-group-arrows-rotate';
-    protected static ?string $modelLabel = 'Reunião';
-    protected static ?string $pluralModelLabel = 'Reuniões';
-    protected static ?string $navigationGroup = 'Reuniões';
+    protected static ?string $navigationIcon = 'fas-people-roof';
+    protected static ?string $modelLabel = 'Assembléia';
+    protected static ?string $pluralModelLabel = 'Assembléias';
+    protected static ?string $navigationGroup = 'Assembléias';
+
+    protected static ?string $slug = 'assembleias';
 
 
     public static function form(Form $form): Form
