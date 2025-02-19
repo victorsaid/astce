@@ -99,7 +99,7 @@ class UserResource extends Resource
                                                 }
                                             };
                                         })
-                                        ->columnSpan(2)
+                                        ->columnSpan(3)
                                         ->placeholder('000.000.000-00')
                                         ->required()
                                         ->mask('999.999.999-99') // Máscara para CPF

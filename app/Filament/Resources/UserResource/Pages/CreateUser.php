@@ -20,6 +20,8 @@ class CreateUser extends CreateRecord
         if (empty($data['password'])) {
             //dd($data['document']);
             $data['password'] = bcrypt($data['document']);
+        }else{
+            $data['password'] = bcrypt($data['password']);
         }
         if (!isset($data['role'])) {
 

@@ -5,11 +5,11 @@ namespace App\Filament\Resources\UserResource\Pages;
 use App\Filament\Resources\UserResource;
 use App\Models\User;
 use Filament\Actions;
+use Filament\Forms\Components\Select;
 use Filament\Resources\Pages\ListRecords;
 use Illuminate\Database\Eloquent\Builder;
 use Filament\Resources\Components\Tab;
 use Illuminate\Support\Facades\Auth;
-use Filament\Actions\DropdownAction;
 
 class ListUsers extends ListRecords
 {
@@ -23,18 +23,36 @@ class ListUsers extends ListRecords
                 ->label('Adicionar Associado'),
 
             Actions\ActionGroup::make([
+
                 Actions\Action::make('Exportar usuários')
                     ->label('Exportar Associados')
                     ->icon('fas-file-pdf')
                     ->color('danger')
-                    ->requiresConfirmation()
-                    ->url(fn(): string => route('pdf.users')),
+                    ->form([
+                        Select::make('order_by')
+                            ->label('Ordenar por')
+                            ->options([
+                                'name' => 'Nome (A-Z)',
+                                'enrollment' => 'Matrícula (Menor para Maior)',
+                            ])
+                            ->default('name')
+                            ->required(),
 
-//                Actions\Action::make('Outra Ação')
-//                    ->label('Outra ação aqui')
-//                    ->icon('fas-hamburger')
-//                    ->color('info')
-//                    ->action(fn() => dd('Executando ação!')),
+                        Select::make('only_active')
+                            ->label('Filtrar por')
+                            ->options([
+                                '1' => 'Apenas Associados Ativos',
+                                '0' => 'Todos os Associados',
+                            ])
+                            ->default('1')
+                            ->required(),
+                    ])
+                    ->action(function (array $data) {
+                        return redirect()->route('pdf.users', [
+                            'order_by' => $data['order_by'],
+                            'only_active' => $data['only_active'],
+                        ]);
+                    }),
             ])
                 ->label('Mais Ações') // Nome do grupo de ações
                 ->icon('fas-ellipsis-vertical') // Ícone do botão

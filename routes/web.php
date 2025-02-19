@@ -21,8 +21,13 @@ Route::get('/', function () {
     return redirect()->route('filament.admin.auth.login');
 });
 
-Route::get('/pdf/meetings/{user}', [\App\Http\Controllers\PdfController::class, 'pdfMeetings'])->name('pdf.example');
-Route::get('/pdf/meeting/{meeting}', [\App\Http\Controllers\PdfController::class, 'exportMeetingPdf'])->name('pdf.export');
+Route::get('/pdf/meetings/{user}', [\App\Http\Controllers\PdfController::class, 'pdfMeetings'])
+    ->name('pdf.example');
+Route::get('/pdf/meeting/{meeting}', [\App\Http\Controllers\PdfController::class, 'exportMeetingPdf'])
+    ->name('pdf.export');
 
 
-Route::get('/pdf/users/', [\App\Http\Controllers\PdfController::class, 'pdfUsers'])->name('pdf.users');
+Route::get('/pdf/users/', [\App\Http\Controllers\PdfController::class, 'pdfUsers'])
+    ->name('pdf.users');
+Route::get('/pdf/user/{user}', [\App\Http\Controllers\PdfController::class, 'memberDeclaration'])
+    ->name('pdf.memberDeclaration');
