@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources;
 
+use App\Filament\Resources\AgreementResource\RelationManagers\AgreementUsersRelationManager;
 use App\Filament\Resources\AgreementsResource\Pages;
 use App\Filament\Resources\AgreementsResource\RelationManagers;
 use App\Models\Agreements;
@@ -125,7 +126,7 @@ class AgreementsResource extends Resource
     public static function getRelations(): array
     {
         return [
-            //
+            AgreementUsersRelationManager::class,
         ];
     }
 
@@ -135,6 +136,7 @@ class AgreementsResource extends Resource
             'index' => Pages\ListAgreements::route('/'),
             'create' => Pages\CreateAgreements::route('/create'),
             'edit' => Pages\EditAgreements::route('/{record}/edit'),
+            'view' => Pages\ViewAgreement::route('/{record}'),
         ];
     }
 }

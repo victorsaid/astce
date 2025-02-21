@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Agreements;
 use App\Models\Meeting;
 use App\Models\User;
 use Illuminate\Http\Request;
@@ -76,6 +77,16 @@ class PdfController extends Controller
         $pdf->set_option('isRemoteEnabled', true);
 
         return $pdf->stream('member_declaration.blade.php');
+    }
+
+    public function beneficiariesAgreement(Agreements $agreement)
+    {
+        $agreement->load('users');
+        //dd($agreement->users);
+        $pdf = Pdf::loadView('pdf.beneficiaries_agreement', ['agreement' => $agreement]);
+        $pdf->set_option('isRemoteEnabled', true);
+
+        return $pdf->stream('beneficiaries_agreement.blade.php');
     }
 
 }

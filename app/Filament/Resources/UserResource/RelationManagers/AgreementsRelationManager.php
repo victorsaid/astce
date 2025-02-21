@@ -69,10 +69,13 @@ class AgreementsRelationManager extends RelationManager
             ->headerActions([
                 AttachAction::make()
                     ->multiple()
-                    ->label('Selecionar Convênio')
+                    ->label('Adicionar Convênio')
+                    ->color('primary')
                     ->preloadRecordSelect() // Carrega os convênios no select ao abrir o modal
                     ->recordSelectSearchColumns(['name', 'description'])
-                    //->recordSelectOptionsQuery(fn (Builder $query) => $query->where('is_active', true))
+                    ->recordSelectOptionsQuery(
+                        fn (Builder $query) => $query->where('is_active', true) // Apenas convênios ativos
+                    )
                     ->recordTitle(fn (Agreements $record) => $record->name),
             ])
             ->actions([
