@@ -18,7 +18,9 @@ class AssociatedTypeResource extends Resource
     protected static ?string $model = AssociatedType::class;
     protected static ?string $navigationGroup = 'Cadastros auxiliares';
     protected static ?string $modelLabel = 'Tipos de associados';
-
+    protected static ?string $pluralModelLabel = 'Tipos de Associados';
+    protected static ?string $pluralLabel = 'Tipos de associados';
+    protected static ?string $navigationLabel = 'Tipos de Associados';
     protected static ?string $navigationIcon = 'fas-boxes';
     protected static ?int $navigationSort = 3;
 
@@ -30,7 +32,7 @@ class AssociatedTypeResource extends Resource
                     ->label('Nome')
                     ->required()
                     ->maxLength(255),
-                Forms\Components\TextInput::make('description')
+                Forms\Components\MarkdownEditor::make('description')
                     ->label('Descrição')
                     ->maxLength(255),
                 Forms\Components\ToggleButtons::make('abble_vote')
@@ -51,18 +53,21 @@ class AssociatedTypeResource extends Resource
                         '1' => 'success',
                     ])
                 ,
-            ]);
+            ])->columns(1);
     }
 
     public static function table(Table $table): Table
     {
         return $table
+            ->defaultSort('name')
             ->columns([
                 Tables\Columns\TextColumn::make('name')
                     ->searchable()
+                    ->sortable()
                     ->label('Nome'),
                 Tables\Columns\TextColumn::make('description')
                     ->searchable()
+                    ->toggleable(isToggledHiddenByDefault: true)
                     ->label('Descrição'),
                 Tables\Columns\IconColumn::make('abble_vote')
                     ->boolean()
@@ -82,6 +87,7 @@ class AssociatedTypeResource extends Resource
             ->actions([
                 Tables\Actions\ViewAction::make(),
                 Tables\Actions\EditAction::make(),
+                Tables\Actions\DeleteAction::make(),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([

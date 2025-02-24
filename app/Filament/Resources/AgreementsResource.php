@@ -39,7 +39,7 @@ class AgreementsResource extends Resource
                     ->required()
                     ->label('Nome')
                     ->maxLength(255),
-                Forms\Components\TextInput::make('description')
+                Forms\Components\MarkdownEditor::make('description')
                     ->required()
                     ->label('Descrição')
                     ->maxLength(255),
@@ -83,6 +83,7 @@ class AgreementsResource extends Resource
     public static function table(Table $table): Table
     {
         return $table
+            ->defaultSort('name')
             ->columns([
                 Tables\Columns\ImageColumn::make('photo')
                     ->label('Foto'),
@@ -91,6 +92,7 @@ class AgreementsResource extends Resource
                     ->searchable(),
                 Tables\Columns\TextColumn::make('description')
                     ->label('Descrição')
+                    ->toggleable(isToggledHiddenByDefault: true)
                     ->searchable(),
                 Tables\Columns\TextColumn::make('site')
                     ->label('Site')
@@ -115,6 +117,7 @@ class AgreementsResource extends Resource
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),
+                Tables\Actions\DeleteAction::make(),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
