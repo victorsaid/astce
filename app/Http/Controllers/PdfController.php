@@ -52,7 +52,7 @@ class PdfController extends Controller
         $query = User::query()
             ->join('associates', 'users.id', '=', 'associates.user_id') // Usa JOIN para garantir que o usuário tenha associado
             ->select('users.*', 'associates.enrollment', 'associates.is_active');
-
+    //dd($query->toSql());
         // Se for para filtrar apenas usuários ativos
         if ($onlyActive) {
             $query->where('associates.is_active', true);
