@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
             $table->date('hire_date');
-            $table->float('salary');
+            $table->decimal('salary', 10, 2);
             $table->boolean('is_active')->default(true);
 
 

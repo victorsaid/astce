@@ -85,6 +85,7 @@ class PayrollResource extends Resource
 
                                 TextInput::make('amount')
                                     ->label('Valor')
+                                    ->prefix('R$')
                                     ->hiddenLabel()
                                     ->numeric()
                                     ->required()

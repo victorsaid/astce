@@ -10,6 +10,7 @@ use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
+use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
@@ -51,14 +52,14 @@ class AgreementsResource extends Resource
                     ->label('Telefone de Contato')
                     ->maxLength(255),
                 Forms\Components\TextInput::make('whatsapp')
-                    ->mask('(99) 9999-9999')
+                    ->mask('(99)99999-9999')
                     ->label('Whatsapp de Contato')
                     ->maxLength(255),
                 Forms\Components\TextInput::make('email')
                     ->email()
                     ->label('Email de Contato')
                     ->maxLength(255),
-                Forms\Components\Select::make('type')
+                Forms\Components\Select::make('category')
                     ->required()
                     ->label('Categoria do Convênio')
                     ->options([
@@ -104,18 +105,21 @@ class AgreementsResource extends Resource
                     ->label('Descrição')
                     ->toggleable(isToggledHiddenByDefault: true)
                     ->searchable(),
-                Tables\Columns\TextColumn::make('site')
-                    ->label('Site')
-                    ->searchable(),
                 Tables\Columns\TextColumn::make('email')
                     ->label('Email de Contato')
                     ->searchable(),
-                Tables\Columns\TextColumn::make('phone')
-                    ->label('Telefone de Contato')
-                    ->searchable(),
-                Tables\Columns\TextColumn::make('whatsapp')
+                TextColumn::make('whatsapp')
+                    ->icon('fas-square-phone') // Ícone do Heroicons
+                    ->color('success') // Cor opcional para destacar o ícone
                     ->label('Whatsapp de Contato')
-                    ->searchable(),
+                    ->searchable()
+                    ->formatStateUsing(fn ($state) =>
+                    preg_replace('/^(\d{2})(\d{4,5})(\d{4})$/', '($1) $2-$3', $state))
+                    ->url(fn ($record) => $record->whatsapp
+                        ? 'https://api.whatsapp.com/send/?phone=55' . preg_replace('/[^0-9]/', '', $record->whatsapp)
+                        : null
+                    )
+                    ->openUrlInNewTab(),
                 Tables\Columns\TextColumn::make('category')
                     ->label('Categoria')
                     ->searchable(),

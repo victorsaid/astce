@@ -13,7 +13,8 @@ return new class extends Migration
     {
         Schema::create('payrolls', function (Blueprint $table) {
             $table->id();
-            $table->date('month'); // Mês referente ao pagamento
+            $table->string('name');
+            $table->date('date'); // Mês referente ao pagamento
             $table->decimal('total', 10, 2)->default(0); // Total do mês
             $table->timestamps();
         });

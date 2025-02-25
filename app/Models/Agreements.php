@@ -14,8 +14,11 @@ class Agreements extends Model
         'description',
         'photo',
         'site',
-        'type',
+        'category',
         'is_active',
+        'phone',
+        'email',
+        'whatsapp',
     ];
 
     protected $casts = [

@@ -19,7 +19,7 @@ class AgreementSeeder extends Seeder
                 'description' => 'Agreement with Alpha Corp for technology collaboration.',
                 'photo' => json_encode(['url' => 'storage/photos/agreement_alpha.jpg']),
                 'site' => 'https://www.alphacorp.com',
-                'type' => 'Technology',
+                'category' => 'Technology',
                 'is_active' => true,
             ],
             [
@@ -27,7 +27,7 @@ class AgreementSeeder extends Seeder
                 'description' => 'A strategic deal with Beta Services for marketing campaigns.',
                 'photo' => json_encode(['url' => 'storage/photos/agreement_beta.jpg']),
                 'site' => 'https://www.betaservices.com',
-                'type' => 'Marketing',
+                'category' => 'Marketing',
                 'is_active' => false,
             ],
             [
@@ -35,7 +35,7 @@ class AgreementSeeder extends Seeder
                 'description' => 'Collaboration with Gamma Health for medical research.',
                 'photo' => json_encode(['url' => 'storage/photos/agreement_gamma.jpg']),
                 'site' => 'https://www.gammahealth.com',
-                'type' => 'Healthcare',
+                'category' => 'Healthcare',
                 'is_active' => true,
             ],
         ];
