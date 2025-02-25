@@ -6,7 +6,7 @@ use App\Filament\Resources\EmployeeResource;
 use Filament\Actions;
 use Filament\Resources\Pages\ListRecords;
 
-class ListFuncTestes extends ListRecords
+class ListEmployee extends ListRecords
 {
     protected static string $resource = EmployeeResource::class;
 

@@ -22,5 +22,6 @@ class Users extends BaseWidget
                 Tables\Columns\TextColumn::make('email')->label('E-mail')->sortable(),
                 Tables\Columns\TextColumn::make('created_at')->label('Cadastrado em')->dateTime('d/m/Y H:i'),
             ]);
+
     }
 }

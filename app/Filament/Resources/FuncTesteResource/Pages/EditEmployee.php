@@ -3,11 +3,12 @@
 namespace App\Filament\Resources\FuncTesteResource\Pages;
 
 use App\Filament\Resources\EmployeeResource;
+use App\Filament\Resources\UserResource;
 use Filament\Actions;
 use Filament\Resources\Pages\EditRecord;
 use Illuminate\Database\Eloquent\Model;
 
-class EditFuncTeste extends EditRecord
+class EditEmployee extends EditRecord
 {
     protected static string $resource = EmployeeResource::class;
 
@@ -64,7 +65,15 @@ class EditFuncTeste extends EditRecord
     protected function getHeaderActions(): array
     {
         return [
+            Actions\ViewAction::make(),
             Actions\DeleteAction::make(),
+
+
         ];
+    }
+
+    protected function getRedirectUrl(): string
+    {
+        return $this->getResource()::getUrl('index');
     }
 }

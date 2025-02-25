@@ -311,7 +311,7 @@ class UserResource extends Resource
                                                 ->required()
                                                 ->maxLength(255),
                                             TextInput::make('street')
-                                                ->label('Rua')
+                                                ->label('Logradouro')
                                                 ->required()
                                                 ->maxLength(255),
                                             TextInput::make('number')
@@ -360,9 +360,6 @@ class UserResource extends Resource
 //                                            fn(Builder $query) => auth()->user()->hasRole(['Admin', 'Super_admin']) ? null :
 //                                                $query->whereNotIn('name', ['Admin', 'Super_admin'])
 //                                        )
-                                        //->required()
-                                        //->preload()
-                                        //->multiple()
                                     ,
                                 ]),
                             ]), //fecha step 4
@@ -443,10 +440,16 @@ class UserResource extends Resource
     public static function table(Table $table): Table
     {
         return $table
+            ->defaultSort('name')
             ->columns([
                 TextColumn::make('name')
+                    ->sortable()
                     ->searchable()
                     ->label('Nome'),
+                TextColumn::make('associate.enrollment')
+                    ->label('Matrícula')
+                    ->searchable()
+                    ->sortable(),
                 TextColumn::make('document')
                     ->label('CPF')
                     ->copyable()

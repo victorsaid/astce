@@ -88,4 +88,9 @@ class CreateFuncTeste extends CreateRecord
         // Criar um novo registro se o CPF não existir
         return parent::handleRecordCreation($data);
     }
+
+    protected function getRedirectUrl(): string
+    {
+        return $this->getResource()::getUrl('index');
+    }
 }

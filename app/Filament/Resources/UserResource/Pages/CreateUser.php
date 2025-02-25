@@ -92,5 +92,10 @@ class CreateUser extends CreateRecord
         return parent::handleRecordCreation($data);
     }
 
+    protected function getRedirectUrl(): string
+    {
+        return $this->getResource()::getUrl('index');
+    }
+
 
 }

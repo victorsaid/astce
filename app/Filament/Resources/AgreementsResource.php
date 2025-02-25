@@ -31,7 +31,6 @@ class AgreementsResource extends Resource
                 Forms\Components\FileUpload::make('photo')
                     ->label('Foto')
                     ->imageEditor()
-                    ->avatar()
                     ->directory('agreements_photos')
                     ->preserveFilenames()
                     ->disk('public'),
@@ -40,7 +39,6 @@ class AgreementsResource extends Resource
                     ->label('Nome')
                     ->maxLength(255),
                 Forms\Components\MarkdownEditor::make('description')
-                    ->required()
                     ->label('Descrição')
                     ->maxLength(255),
 
@@ -48,15 +46,27 @@ class AgreementsResource extends Resource
                     ->prefix('https://')
                     ->label('Site')
                     ->maxLength(255),
+                Forms\Components\TextInput::make('phone')
+                    ->mask('(99) 9999-9999')
+                    ->label('Telefone de Contato')
+                    ->maxLength(255),
+                Forms\Components\TextInput::make('whatsapp')
+                    ->mask('(99) 9999-9999')
+                    ->label('Whatsapp de Contato')
+                    ->maxLength(255),
+                Forms\Components\TextInput::make('email')
+                    ->email()
+                    ->label('Email de Contato')
+                    ->maxLength(255),
                 Forms\Components\Select::make('type')
                     ->required()
-                    ->label('Tipo')
+                    ->label('Categoria do Convênio')
                     ->options([
-                        'Saude' => 'Saude e Bem Estar',
-                        'Educacao' => 'Educacao e Capacitacao',
-                        'Plano de Saude' => 'Plano de Saude',
-                        'Lazer' => 'Lazer e Entretenimento',
-                        'Compras' => 'Compras e Servicos',
+                        'Saúde e Bem Estar' => 'Saúde e Bem Estar',
+                        'Educação e Capacitação' => 'Educação e Capacitação',
+                        'Plano de Saúde' => 'Plano de Saúde',
+                        'Lazer e Entretenimento' => 'Lazer e Entretenimento',
+                        'Compras e Serviços' => 'Compras e Serviços',
 
                     ]),
                 Forms\Components\ToggleButtons::make('is_active')
@@ -97,8 +107,17 @@ class AgreementsResource extends Resource
                 Tables\Columns\TextColumn::make('site')
                     ->label('Site')
                     ->searchable(),
-                Tables\Columns\TextColumn::make('type')
-                    ->label('Tipo')
+                Tables\Columns\TextColumn::make('email')
+                    ->label('Email de Contato')
+                    ->searchable(),
+                Tables\Columns\TextColumn::make('phone')
+                    ->label('Telefone de Contato')
+                    ->searchable(),
+                Tables\Columns\TextColumn::make('whatsapp')
+                    ->label('Whatsapp de Contato')
+                    ->searchable(),
+                Tables\Columns\TextColumn::make('category')
+                    ->label('Categoria')
                     ->searchable(),
                 Tables\Columns\IconColumn::make('is_active')
                     ->label('Ativo')
@@ -132,6 +151,8 @@ class AgreementsResource extends Resource
             AgreementUsersRelationManager::class,
         ];
     }
+
+
 
     public static function getPages(): array
     {

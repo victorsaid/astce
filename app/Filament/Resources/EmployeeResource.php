@@ -354,7 +354,6 @@ class EmployeeResource extends Resource
                                         ->prefix('R$') // Exibe o símbolo da moeda
                                         ->numeric() // Garante que apenas números sejam aceitos
                                         ->default(0.00) // Define um valor padrão inicial
-
                                         ,
 
                                     Forms\Components\ToggleButtons::make('is_active')
@@ -386,8 +385,10 @@ class EmployeeResource extends Resource
     public static function table(Table $table): Table
     {
         return $table
+            ->defaultSort('name')
             ->columns([
                 Tables\Columns\TextColumn::make('name')
+                    ->sortable()
                     ->searchable()
                     ->label('Nome'),
                 Tables\Columns\TextColumn::make('document')
@@ -455,6 +456,9 @@ class EmployeeResource extends Resource
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),
+                Tables\Actions\DeleteAction::make(),
+                Tables\Actions\ViewAction::make(),
+
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
@@ -479,9 +483,10 @@ class EmployeeResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListFuncTestes::route('/'),
+            'index' => Pages\ListEmployee::route('/'),
             'create' => Pages\CreateFuncTeste::route('/create'),
-            'edit' => Pages\EditFuncTeste::route('/{record}/edit'),
+            'edit' => Pages\EditEmployee::route('/{record}/edit'),
+            'view' => Pages\ViewEmployee::route('/{record}'),
         ];
     }
 

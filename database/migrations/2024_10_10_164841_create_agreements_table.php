@@ -14,10 +14,13 @@ return new class extends Migration
         Schema::create('agreements', function (Blueprint $table) {
             $table->id();
             $table->string('name');
-            $table->string('description');
+            $table->string('description')->nullable();
             $table->json('photo')->nullable();
             $table->string('site')->nullable();
-            $table->string('type');
+            $table->string('phone')->nullable();
+            $table->string('whatsapp')->nullable();
+            $table->string('email')->nullable();
+            $table->string('category');
             $table->boolean('is_active')->default(true);
             $table->timestamps();
         });
