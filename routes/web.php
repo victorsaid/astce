@@ -34,3 +34,6 @@ Route::get('/pdf/user/{user}', [\App\Http\Controllers\PdfController::class, 'mem
 
 Route::get('/pdf/agreement/{agreement}', [\App\Http\Controllers\PdfController::class, 'beneficiariesAgreement'])
     ->name('pdf.beneficiariesAgreement');
+
+Route::get('/pdf/payroll/{payroll}', [\App\Http\Controllers\PdfController::class, 'payrollExport'])
+    ->name('pdf.payrollExport');

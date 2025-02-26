@@ -14,6 +14,28 @@ class ViewPayroll extends ViewRecord
     {
         return [
             Actions\EditAction::make(),
+
+            Actions\ActionGroup::make([
+                Actions\Action::make('Exportar Folha de Pagamento')
+                    ->label('Exportar Folha de Pagamento')
+                    ->icon('fas-file-pdf')
+                    ->color('danger')
+                    ->requiresConfirmation()
+                    ->action(function () {
+                        return redirect()->route('pdf.payrollExport', ['payroll' => $this->record->id]);
+                    }),
+                Actions\Action::make('Declaração de Associado')
+                    ->label('Declaração de Associado')
+                    ->icon('fas-file-pdf')
+                    ->color('success')
+                    ->requiresConfirmation()
+                    ->url(
+                        fn(): string => route('pdf.memberDeclaration', ['user' => $this->record->id])
+                    ),
+            ])
+                ->label('Mais Ações') // Nome do grupo de ações
+                ->icon('fas-ellipsis-vertical') // Ícone do botão
+                ->color('primary'), // Cor do botão principal
         ];
     }
 }

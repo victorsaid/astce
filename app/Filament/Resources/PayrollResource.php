@@ -37,13 +37,19 @@ class PayrollResource extends Resource
     {
         return $form
             ->schema([
-                DatePicker::make('month')
-                    ->label('Mês')
+                TextInput::make('name')
+                ->label('Nome')
+                ->required()
+                ->columnSpan(2)
+                ->maxLength(255),
+                DatePicker::make('date')
+                    ->label('Data')
                     ->required()
                     ->date(),
 
                 Forms\Components\Placeholder::make('total')
                     ->label('Total')
+
                     ->content(function (Forms\Get $get, Forms\Set $set) {
                         $total = 0;
                         if (!$repeaters = $get('payments')) {
@@ -64,7 +70,7 @@ class PayrollResource extends Resource
                     ->columns(1)
                     ->schema([
                         Repeater::make('payments')
-                            ->columns(2)
+                            ->columns(4)
                             ->label('Todos os Associados')
                             ->hiddenLabel()
                             ->addActionLabel('Adicionar Pagamento')
@@ -72,6 +78,7 @@ class PayrollResource extends Resource
                             ->schema([
                                 Select::make('user_id')
                                     ->label('Associado')
+                                    ->prefix('Associado:')
                                     ->hiddenLabel()
                                     ->options(
                                         User::whereHas('associate', function ($query) {
@@ -81,6 +88,7 @@ class PayrollResource extends Resource
                                             ->toArray()
                                     )
                                     ->required()
+                                    ->columnSpan(3)
                                     ->disableOptionsWhenSelectedInSiblingRepeaterItems(),
 
                                 TextInput::make('amount')
@@ -88,38 +96,55 @@ class PayrollResource extends Resource
                                     ->prefix('R$')
                                     ->hiddenLabel()
                                     ->numeric()
+                                    ->columnSpan(1)
                                     ->required()
                                     ->reactive()
                                     ->live(debounce: 1500),
                             ])
-                            ->default(fn() => User::whereHas('associate', function ($query) {
-                                $query->where('is_active', true);
-                            })
-                                ->orderBy('name')
-                                ->get()
-                                ->map(fn($user) => [
-                                    'user_id' => $user->id,
-                                    'amount' => 0, // Inicialmente zero para novos registros
-                                ])
-                                ->toArray()
-                            ),
+                            ->default(function () {
+                                // Busca a última folha de pagamento existente
+                                $lastPayroll = \App\Models\Payroll::latest('name')->first();
+
+                                // Se houver uma folha de pagamento anterior, pegar os valores de pagamento dos usuários
+                                $previousPayments = $lastPayroll
+                                    ? $lastPayroll->payments->pluck('amount', 'user_id')->toArray()
+                                    : [];
+
+                                return User::whereHas('associate', function ($query) {
+                                    $query->where('is_active', true);
+                                })
+                                    ->orderBy('name')
+                                    ->get()
+                                    ->map(fn ($user) => [
+                                        'user_id' => $user->id,
+                                        'amount' => $previousPayments[$user->id] ?? 0, // Se houver valor do mês passado, usa; senão, começa com 0
+                                    ])
+                                    ->toArray();
+                            }),
                     ]),
 
-            ]);
+            ])->columns(4);
     }
 
     public static function table(Table $table): Table
     {
         return $table
+            ->defaultSort('date', 'desc')
             ->columns([
-                TextColumn::make('month')->label('Mês')->date(),
-                TextColumn::make('total')->label('Total')->money('BRL'),
+                TextColumn::make('name')->label('Nome')
+                ->searchable()
+                ->sortable(),
+                TextColumn::make('date')->label('Data')->date('d/m/Y')->sortable(),
+                TextColumn::make('total')->label('Total')->money('BRL')->badge()->color('success')->sortable(),
             ])
             ->filters([
                 //
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),
+                Tables\Actions\DeleteAction::make()->requiresConfirmation(),
+
+
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
@@ -141,6 +166,7 @@ class PayrollResource extends Resource
             'index' => Pages\ListPayrolls::route('/'),
             'create' => Pages\CreatePayroll::route('/create'),
             'edit' => Pages\EditPayroll::route('/{record}/edit'),
+            'view' => Pages\ViewPayroll::route('/{record}'),
         ];
     }
 }

@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Agreements;
 use App\Models\Meeting;
+use App\Models\Payroll;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Barryvdh\DomPDF\Facade\Pdf;
@@ -87,6 +88,16 @@ class PdfController extends Controller
         $pdf->set_option('isRemoteEnabled', true);
 
         return $pdf->stream('beneficiaries_agreement.blade.php');
+    }
+
+    public function payrollExport(Payroll $payroll)
+    {
+        $payroll->load('payments');
+        //dd($payroll);
+        $pdf = Pdf::loadView('pdf.pdf_payrollExport', ['payroll' => $payroll]);
+        $pdf->set_option('isRemoteEnabled', true);
+        return $pdf->stream('pdf_payrollExport.blade.php');
+
     }
 
 }

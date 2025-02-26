@@ -430,7 +430,7 @@ class UserResource extends Resource
                                             ->searchable(),
                                     ])
                                 ]) ,
-                    ])->startOnStep(1), //fecha wizard
+                    ])->startOnStep(1)->skippable(), //fecha wizard
 
                 ]),  //fecha grid
             ]); //fecha schema do form
