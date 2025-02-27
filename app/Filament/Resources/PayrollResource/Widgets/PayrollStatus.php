@@ -13,7 +13,8 @@ class PayrollStatus extends BaseWidget
     {
         $lastPayroll = Payroll::latest('date')->first();
 
-        $totalPayments = $lastPayroll ? PayrollPayment::where('payroll_id', $lastPayroll->id)->sum('amount') : 0;
+        //$totalPayments = $lastPayroll ? PayrollPayment::where('payroll_id', $lastPayroll->id)->sum('amount') : 0;
+        $totalPayments = Payroll::all()->sum('total');
 
         return [
             Card::make('Última Folha de Pagamento', $lastPayroll ? 'R$ ' . number_format($lastPayroll->total, 2, ',', '.') : 'Nenhum registro')
