@@ -363,73 +363,79 @@ class UserResource extends Resource
                                     ,
                                 ]),
                             ]), //fecha step 4
-                            Wizard\Step::make('Associados') //passo 5
+                        Wizard\Step::make('Associados') // Passo 5
+                        ->schema([
+                            Fieldset::make('Informações sobre o Associado')
+                                ->relationship('associate', 'associate')
                                 ->schema([
-                                    Fieldset::make('Informações sobre o Associado')
-                                    ->relationship('associate', 'associate')
-                                    ->schema([
-                                        TextInput::make('enrollment')
-                                            ->label('Matrícula')
-                                            ->required()
-                                            ->maxLength(255)
-                                            ->columnSpan(1),
+                                    TextInput::make('enrollment')
+                                        ->label('Matrícula')
+                                        ->required()
+                                        ->maxLength(255)
+                                        ->columnSpan(4), // Ocupa toda a linha em telas pequenas
 
-                                        Select::make('associated_type_id')
-                                            ->label('Tipo de Membro')
-                                            ->relationship('associated_type', 'name')
-                                            ->required()
-                                            ->preload()
-                                            ->columnSpan(1),
+                                    Select::make('associated_type_id')
+                                        ->label('Tipo de Membro')
+                                        ->relationship('associated_type', 'name')
+                                        ->required()
+                                        ->preload()
+                                        ->columnSpan(4),
 
-                                        Select::make('position_id')
-                                            ->label('Cargo')
-                                            ->required()
-                                            ->relationship('position', 'name')
-                                            ->columnSpan(1),
+                                    Select::make('position_id')
+                                        ->label('Cargo')
+                                        ->required()
+                                        ->relationship('position', 'name')
+                                        ->columnSpan(4),
 
-                                        Forms\Components\ToggleButtons::make('is_active')
-                                            ->label('Associado Ativo?')
-                                            ->required()
-                                            ->columnSpan(1)
-                                            ->default(true)
-                                            ->inline()
-                                            ->options([
-                                                '0' => 'Não',
-                                                '1' => 'Sim',
-                                            ])
-                                            ->icons([
-                                                '0' => 'heroicon-o-x-mark',
-                                                '1' => 'heroicon-o-check',
-                                            ])
-                                            ->colors([
-                                                '0' => 'danger',
-                                                '1' => 'success',
-                                            ]),
-                                        Repeater::make('associationPeriods')
-                                            ->label('Tempo de Associado')
-                                            ->relationship('associationPeriods') // Define o relacionamento
-                                            ->schema([
-                                                DatePicker::make('start_date')
-                                                    ->label('Data de Início')
-                                                    ->required(),
+                                    Repeater::make('associationPeriods')
+                                        ->label('Tempo de Associado')
+                                        ->relationship('associationPeriods')
+                                        ->addActionLabel('Novo periodo de Associação')
+                                        ->schema([
+                                            DatePicker::make('start_date')
+                                                ->label('Data de Início')
+                                                ->required()
+                                                ->columnSpan(6),
 
-                                                DatePicker::make('end_date')
-                                                    ->label('Data de Término')
-                                                    ->nullable(),
-                                            ])->columnSpan(2)->columns(2),
+                                            DatePicker::make('end_date')
+                                                ->label('Data de Término')
+                                                ->nullable()
+                                                ->columnSpan(6),
+                                        ])
+                                        ->columnSpan(6), // Garante que o Repeater ocupe toda a largura em telas pequenas
+                                    Forms\Components\ToggleButtons::make('is_active')
+                                        ->label('Associado Ativo?')
+                                        ->required()
+                                        ->default(true)
+                                        ->inline()
+                                        ->options([
+                                            '0' => 'Não',
+                                            '1' => 'Sim',
+                                        ])
+                                        ->icons([
+                                            '0' => 'heroicon-o-x-mark',
+                                            '1' => 'heroicon-o-check',
+                                        ])
+                                        ->colors([
+                                            '0' => 'danger',
+                                            '1' => 'success',
+                                        ])
+                                        ->columnSpan(4),
+                                ])
+                                ->columns(12), // Layout organizado para telas grandes
 
-                                    ])->columns(4),
+                            Fieldset::make('Convênios do Associado')
+                                ->schema([
+                                    Select::make('agreements')
+                                        ->label('Convênios')
+                                        ->multiple() // Permite selecionar vários convênios
+                                        ->relationship('agreements', 'name') // Apenas relaciona sem criar novos registros
+                                        ->preload()
+                                        ->searchable(), // Ocupa toda a largura para melhor exibição
+                                ]),
+                        ]),
 
-                                Fieldset::make('Convênios do Associado')
-                                    ->schema([
-                                        Select::make('agreements')
-                                            ->label('Convênios')
-                                            ->multiple() // Permite selecionar vários convênios
-                                            ->relationship('agreements', 'name') // Apenas relaciona sem criar novos registros
-                                            ->preload()
-                                            ->searchable(),
-                                    ])
-                                ]) ,
+
                     ])->startOnStep(1)->skippable(), //fecha wizard
 
                 ]),  //fecha grid

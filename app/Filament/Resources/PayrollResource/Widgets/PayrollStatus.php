@@ -22,7 +22,7 @@ class PayrollStatus extends BaseWidget
                 ->color($lastPayroll ? 'success' : 'danger'),
 
             Card::make('Total de Pagamentos', 'R$ ' . number_format($totalPayments, 2, ',', '.'))
-                ->description('Total pago na última folha')
+                ->description('Total em pagamentos')
                 ->color($totalPayments > 0 ? 'info' : 'warning'),
         ];
     }
