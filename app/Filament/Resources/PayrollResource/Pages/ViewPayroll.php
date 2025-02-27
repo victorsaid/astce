@@ -10,6 +10,8 @@ class ViewPayroll extends ViewRecord
 {
     protected static string $resource = PayrollResource::class;
 
+
+
     protected function getHeaderActions(): array
     {
         return [
@@ -20,18 +22,21 @@ class ViewPayroll extends ViewRecord
                     ->label('Exportar Folha de Pagamento')
                     ->icon('fas-file-pdf')
                     ->color('danger')
-                    ->requiresConfirmation()
-                    ->action(function () {
-                        return redirect()->route('pdf.payrollExport', ['payroll' => $this->record->id]);
+                    ->form([
+                        \Filament\Forms\Components\Select::make('order_by')
+                            ->label('Ordenar por')
+                            ->options([
+                                'name' => 'Nome (Ordem Alfabética)',
+                                'enrollment' => 'Matrícula',
+                            ])
+                            ->required(),
+                    ])
+                    ->action(function (array $data) {
+                        return redirect()->route('pdf.payrollExport', [
+                            'payroll' => $this->record->id,
+                            'order_by' => $data['order_by'],
+                        ]);
                     }),
-                Actions\Action::make('Declaração de Associado')
-                    ->label('Declaração de Associado')
-                    ->icon('fas-file-pdf')
-                    ->color('success')
-                    ->requiresConfirmation()
-                    ->url(
-                        fn(): string => route('pdf.memberDeclaration', ['user' => $this->record->id])
-                    ),
             ])
                 ->label('Mais Ações') // Nome do grupo de ações
                 ->icon('fas-ellipsis-vertical') // Ícone do botão

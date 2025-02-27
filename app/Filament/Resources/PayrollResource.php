@@ -4,6 +4,7 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\PayrollResource\Pages;
 use App\Filament\Resources\PayrollResource\RelationManagers;
+use App\Filament\Resources\PayrollResource\Widgets\PayrollStatus;
 use App\Models\Payroll;
 use App\Models\PayrollPayment;
 use App\Models\User;
@@ -143,6 +144,7 @@ class PayrollResource extends Resource
             ->actions([
                 Tables\Actions\EditAction::make(),
                 Tables\Actions\DeleteAction::make()->requiresConfirmation(),
+                Tables\Actions\ViewAction::make(),
 
 
             ])
@@ -156,7 +158,7 @@ class PayrollResource extends Resource
     public static function getRelations(): array
     {
         return [
-            PayrollResource\RelationManagers\PaymentsRelationManager::class,
+            //PayrollResource\RelationManagers\PaymentsRelationManager::class,
         ];
     }
 
@@ -169,4 +171,11 @@ class PayrollResource extends Resource
             'view' => Pages\ViewPayroll::route('/{record}'),
         ];
     }
+    public static function getWidgets(): array
+    {
+        return [
+            PayrollStatus::class,
+        ];
+    }
+
 }

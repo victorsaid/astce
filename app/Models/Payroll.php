@@ -19,8 +19,4 @@ class Payroll extends Model
         return $this->hasMany(PayrollPayment::class);
     }
 
-    public function calculateTotal() {
-        $this->total = $this->payments()->sum('amount');
-        $this->save();
-    }
 }

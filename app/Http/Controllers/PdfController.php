@@ -67,10 +67,6 @@ class PdfController extends Controller
         }
         return $query;
     }
-
-
-
-
     public function memberDeclaration(User $user)
     {
         $employee = Auth::user();
@@ -90,14 +86,26 @@ class PdfController extends Controller
         return $pdf->stream('beneficiaries_agreement.blade.php');
     }
 
-    public function payrollExport(Payroll $payroll)
+    public function payrollExport(Payroll $payroll, Request $request)
     {
-        $payroll->load('payments');
-        //dd($payroll);
-        $pdf = Pdf::loadView('pdf.pdf_payrollExport', ['payroll' => $payroll]);
+        $payroll->load('payments.user.associate'); // Carrega os relacionamentos corretamente
+
+        // Obtém o critério de ordenação da requisição
+        $orderBy = $request->query('order_by', 'name');
+
+        // Aplica a ordenação
+        $sortedPayments = $payroll->payments->sortBy(fn($payment) =>
+        $orderBy === 'enrollment' ? $payment->user->associate->enrollment : $payment->user->name
+        );
+
+        // Gera o PDF com os pagamentos ordenados
+        $pdf = Pdf::loadView('pdf.pdf_payrollExport', [
+            'payroll' => $payroll,
+            'payments' => $sortedPayments,
+        ]);
+
         $pdf->set_option('isRemoteEnabled', true);
-        return $pdf->stream('pdf_payrollExport.blade.php');
+        return $pdf->stream('pdf_payrollExport.pdf');
 
     }
-
 }

@@ -450,6 +450,17 @@ class UserResource extends Resource
                     ->label('Matrícula')
                     ->searchable()
                     ->sortable(),
+                TextColumn::make('associate.associated_type.name')
+                    ->label('Tipo de Associado')
+                    ->searchable()
+                    ->sortable()
+                    ->badge()
+                    ->color(fn ($record) => match ($record->associate->associated_type->name) {
+                        'Efetivo' => 'success',
+                        'Comissionado' => 'primary',
+                        'Disposição' => 'info',
+                        'Aposentado' => 'danger',
+                    }),
                 TextColumn::make('document')
                     ->label('CPF')
                     ->copyable()
@@ -462,7 +473,8 @@ class UserResource extends Resource
                     ),
                 TextColumn::make('email')
                     ->searchable()
-                    ->copyable(),
+                    ->copyable()
+                    ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('gender')
                     ->searchable()
                     ->label('Gênero')
@@ -514,9 +526,11 @@ class UserResource extends Resource
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
-
-
-            ],layout: Tables\Enums\FiltersLayout::AboveContent)
+                Tables\Filters\SelectFilter::make('associate.associated_type_id')
+                    ->label('Tipo de Associado')
+                    ->relationship('associate.associated_type', 'name') // Exibe os nomes corretamente
+                    ->preload(), // Carrega os nomes no dropdown
+            ])
             ->actions([
                 //Tables\Actions\ViewAction::make(),
                 Tables\Actions\EditAction::make(),

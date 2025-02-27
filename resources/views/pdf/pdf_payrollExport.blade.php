@@ -28,6 +28,9 @@
             text-align: center;
             margin-bottom: 20px;
         }
+        p{
+            font-size:  10px;
+        }
     </style>
 </head>
 <body>
@@ -37,26 +40,34 @@
          alt="Logo">
 </div>
 <h1>Folha de pagamento</h1>
+<h3><strong>{{$payroll->name}}</strong></h3>
+<h3><strong>Data da folha: </strong>{{ \Carbon\Carbon::parse($payroll->date)->format('d/m/Y') }}</h3>
 <p>Emitido em {{ \Carbon\Carbon::now()->format('d/m/Y H:i') }}</p>
 <table>
     <thead>
     <tr>
         <th>#</th>
-        <th>Assocido</th>
+        <th>Associado</th>
+        <th>Matrícula</th>
         <th>Valor</th>
         {{--        <th>Data</th>--}}
     </tr>
     </thead>
     <tbody>
-    @foreach ($payroll->payments as $payment)
+    @foreach ($payments as $payment)
         <tr>
             <td>{{$loop->iteration}}</td>
-            <td>{{ $payment->id }}</td>
-{{--            <td>{{ $user->associate->enrollment }}</td>--}}
-{{--            <td>{{ \Carbon\Carbon::parse($meeting->date)->format('d/m/Y H:i') }}</td>--}}
+            <td>{{ $payment->user->name }}</td>
+            <td>{{ $payment->user->associate->enrollment }}</td>
+            <td>{{ $payment->amount }}</td>
         </tr>
     @endforeach
+    <tr>
+        <td colspan="3" class="text-end"><strong>Total:</strong></td>
+        <td><strong>{{ $payroll->total }}</strong></td>
+    </tr>
     </tbody>
+
 </table>
 </body>
 </html>
