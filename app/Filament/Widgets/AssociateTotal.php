@@ -9,11 +9,12 @@ use Filament\Widgets\StatsOverviewWidget\Stat;
 
 class AssociateTotal extends BaseWidget
 {
+    protected static bool $isLazy = false;
     protected function getStats(): array
     {
         return [
             Stat::make('Associados', User::whereHas('associate', function ($query){
-                $query->where('is_active', 1);
+                $query->where('is_active', 1)->limit(5);
             })->count())
             ->description('Associados ativos')
             ->icon('heroicon-o-users')

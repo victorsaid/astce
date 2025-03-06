@@ -355,6 +355,10 @@ class EmployeeResource extends Resource
                                         ->numeric() // Garante que apenas números sejam aceitos
                                         ->default(0.00) // Define um valor padrão inicial
                                         ,
+                                    TextInput::make('position')
+                                        ->label('Cargo')
+                                        ->required()
+                                        ->maxLength(255),
 
                                     Forms\Components\ToggleButtons::make('is_active')
                                         ->label('Funcionário Ativo?')
@@ -376,7 +380,7 @@ class EmployeeResource extends Resource
 
                                 ]),
                         ]),
-                    ]), //fecha wizard
+                    ])->skippable(), //fecha wizard
 
                 ]),  //fecha grid
             ]); //fecha schema do form
@@ -456,7 +460,26 @@ class EmployeeResource extends Resource
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),
-                Tables\Actions\DeleteAction::make(),
+                Tables\Actions\DeleteAction::make()
+                    ->requiresConfirmation()
+                    ->action(function ($record){
+                        if($record->associate){
+                            return Notification::make()
+                                ->title('Erro ao excluir')
+                                ->body('Este funcionário está associado a um associado. Não é possível excluir.')
+                                ->danger()
+                                ->send();
+                        }elseif($record->employee){
+                            $record->associate->delete();
+                            $record->removeRole('Employee');
+                            return Notification::make()
+                                ->title('Funcionário excluído com sucesso!')
+                                ->success()
+                                ->send();
+                        }
+                        return false;
+                    })
+                ,
                 Tables\Actions\ViewAction::make(),
 
             ])
@@ -477,14 +500,14 @@ class EmployeeResource extends Resource
     //Oculta o resource de funcionário para um funcionário
     public static function canAccess(): bool
     {
-        return Auth::check() && (Auth::user()->roles->pluck('name')->diff(['Employee'])->isNotEmpty());
+        return Auth::check() && (Auth::user()->roles->pluck('name')->diff(['Employee', 'Associate'])->isNotEmpty());
     }
 
     public static function getPages(): array
     {
         return [
             'index' => Pages\ListEmployee::route('/'),
-            'create' => Pages\CreateFuncTeste::route('/create'),
+            'create' => Pages\CreateEmployee::route('/create'),
             'edit' => Pages\EditEmployee::route('/{record}/edit'),
             'view' => Pages\ViewEmployee::route('/{record}'),
         ];

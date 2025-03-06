@@ -14,6 +14,7 @@ class Dependant extends Model
         'name',
         'birth_date',
         'relation',
+        'document',
     ];
 
     public function user()

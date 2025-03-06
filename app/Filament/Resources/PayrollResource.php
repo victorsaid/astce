@@ -4,7 +4,8 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\PayrollResource\Pages;
 use App\Filament\Resources\PayrollResource\RelationManagers;
-use App\Filament\Resources\PayrollResource\Widgets\PayrollStatus;
+use App\Filament\Resources\PayrollResource\Widgets\PayrollFooterWidget;
+use App\Filament\Resources\PayrollResource\Widgets\PayrollHeaderWidget;
 use App\Models\Payroll;
 use App\Models\PayrollPayment;
 use App\Models\User;
@@ -71,7 +72,7 @@ class PayrollResource extends Resource
                     ->columns(1)
                     ->schema([
                         Repeater::make('payments')
-                            ->columns(4)
+                            ->columns(5)
                             ->label('Todos os Associados')
                             ->hiddenLabel()
                             ->addActionLabel('Adicionar Pagamento')
@@ -79,7 +80,7 @@ class PayrollResource extends Resource
                             ->schema([
                                 Select::make('user_id')
                                     ->label('Associado')
-                                    ->prefix('Associado:')
+                                    ->prefix('Associado(a):')
                                     ->hiddenLabel()
                                     ->options(
                                         User::whereHas('associate', function ($query) {
@@ -90,7 +91,17 @@ class PayrollResource extends Resource
                                     )
                                     ->required()
                                     ->columnSpan(3)
+                                    ->reactive()
+                                    ->afterStateUpdated(fn ($state, callable $set) =>
+                                    $set('associated_type', User::find($state)?->associate->associated_type?->name ?? 'N/A')
+                                    )
                                     ->disableOptionsWhenSelectedInSiblingRepeaterItems(),
+
+                                TextInput::make('associated_type')
+                                    ->label('Tipo de Associado')
+                                    ->hiddenLabel()
+                                    ->readOnly() // O campo será preenchido automaticamente
+                                    ->columnSpan(1), // Ocupa apenas uma coluna
 
                                 TextInput::make('amount')
                                     ->label('Valor')
@@ -118,6 +129,7 @@ class PayrollResource extends Resource
                                     ->get()
                                     ->map(fn ($user) => [
                                         'user_id' => $user->id,
+                                        'associated_type' => $user->associate->associated_type?->name ?? 'N/A',
                                         'amount' => $previousPayments[$user->id] ?? 0, // Se houver valor do mês passado, usa; senão, começa com 0
                                     ])
                                     ->toArray();
@@ -171,11 +183,6 @@ class PayrollResource extends Resource
             'view' => Pages\ViewPayroll::route('/{record}'),
         ];
     }
-    public static function getWidgets(): array
-    {
-        return [
-            PayrollStatus::class,
-        ];
-    }
+
 
 }

@@ -5,6 +5,7 @@ namespace App\Filament\Resources;
 use App\Filament\Resources\UserResource\Pages;
 use App\Filament\Resources\UserResource\RelationManagers;
 use App\Models\User;
+
 //use Filament\Actions\Action;
 use Filament\Forms\Components\Actions\Action;
 use Filament\Facades\Filament;
@@ -42,8 +43,6 @@ use Filament\Tables\Columns\TextColumn;
 use Closure;
 
 
-
-
 class UserResource extends Resource
 {
     protected static ?string $model = User::class;
@@ -64,18 +63,22 @@ class UserResource extends Resource
                         // Passo 1: Informações Pessoais
                         Wizard\Step::make('Informações Pessoais')
                             ->schema([
-                                Grid::make(12) // Dividindo em 2 colunas para melhorar layout
+                                Grid::make(12)//grid step 1
                                 ->schema([
-                                    FileUpload::make('photo')
-                                        ->label('Foto')
-                                        ->imageEditor()
-                                        ->avatar()
-                                        ->directory('profile_photos')
-                                        ->preserveFilenames()
-                                        ->disk('public')
-                                        ->columnSpan(2),
+                                    Forms\Components\Split::make([
+                                        Forms\Components\Section::make([
+                                            FileUpload::make('photo')
+                                                ->label('Foto de Perfil')
+                                                ->imageEditor()
+                                                ->directory('profile_photos')
+                                                ->preserveFilenames()
+                                                ->disk('public')
+                                                ->columnSpan(3),
+                                        ])
+                                    ])->columnSpan(4),
                                     TextInput::make('document')
                                         ->label('CPF')
+                                        ->columnSpan(4)
                                         ->rule(function (Forms\Get $get) {
                                             return function (string $attribute, $value, \Closure $fail) use ($get) {
                                                 // 🔹 Remove pontuações do CPF
@@ -99,7 +102,6 @@ class UserResource extends Resource
                                                 }
                                             };
                                         })
-                                        ->columnSpan(3)
                                         ->placeholder('000.000.000-00')
                                         ->required()
                                         ->mask('999.999.999-99') // Máscara para CPF
@@ -113,7 +115,7 @@ class UserResource extends Resource
                                                             ->title('Digite o CPF para buscar')
                                                             ->danger()->send();
                                                         return;
-                                                    }else{
+                                                    } else {
                                                         $cpfSanitizado = preg_replace('/[^0-9]/', '', $state);
                                                         $userData = User::where('document', $cpfSanitizado)->first();
                                                         if ($userData && $userData->associate) {
@@ -137,10 +139,10 @@ class UserResource extends Resource
                                                         $userData = User::where('document', $cpfSanitizado)->firstOrFail();
                                                         $set('name', $userData->name ?? '');
                                                         $set('gender', $userData->gender ?? '');
-                                                        $set('birth_date', $userData->birth_date?? '');
+                                                        $set('birth_date', $userData->birth_date ?? '');
                                                         $set('blood_type', $userData->blood_type ?? '');
                                                         $set('marital_status', $userData->marital_status ?? '');
-                                                        $set('education_level', $userData->education_level?? '');
+                                                        $set('education_level', $userData->education_level ?? '');
                                                         $set('email', $userData->email ?? '');
                                                         $firstPhone = $userData->phone ? $userData->phone->first() : null;
                                                         ///seta os contatos
@@ -150,7 +152,7 @@ class UserResource extends Resource
                                                                 'type' => $firstPhone->type,
                                                                 'observation' => $firstPhone->observation,
                                                             ]
-                                                        ]: []);
+                                                        ] : []);
                                                         // seta o endereço
                                                         $set('address', [
                                                             'zip_code' => $userData->address->zip_code,
@@ -162,7 +164,7 @@ class UserResource extends Resource
                                                             'complement' => $userData->address->complement,
                                                         ]);
 
-                                                    }catch (ModelNotFoundException $e){
+                                                    } catch (ModelNotFoundException $e) {
                                                         Notification::make()
                                                             ->title('CPF não encontrado')
                                                             ->danger()->send();
@@ -175,37 +177,38 @@ class UserResource extends Resource
                                         ->columnSpan(4)
                                         ->required()
                                         ->maxLength(255),
+                                    DatePicker::make('birth_date')
+                                        ->label('Data de Nascimento')
+                                        ->columnSpan(3)
+                                        ->date('d/m/Y')
+                                        ->required(),
                                     Select::make('gender')
                                         ->label('Gênero')
                                         ->required()
-                                        ->columnSpan(2)
+                                        ->columnSpan(3)
                                         ->options([
                                             'masculino' => 'Masculino',
                                             'feminino' => 'Feminino',
                                             'nao_binario' => 'Não Binário',
                                             'nao_informar' => 'Não Informar',
                                         ]),
-                                    DatePicker::make('birth_date')
-                                        ->label('Data de Nascimento')
-                                        ->columnSpan(2)
-                                        ->date('d/m/Y')
-                                        ->required(),
-                                    Select::make('blood_type')
-                                        ->label('Tipo Sanguíneo')
-                                        ->columnSpan(2)
-                                        ->options([
-                                            'A+' => 'A+',
-                                            'A-' => 'A-',
-                                            'B+' => 'B+',
-                                            'B-' => 'B-',
-                                            'AB+' => 'AB+',
-                                            'AB-' => 'AB-',
-                                            'O+' => 'O+',
-                                            'O-' => 'O-',
-                                        ]),
+
+//                                    Select::make('blood_type')
+//                                        ->label('Tipo Sanguíneo')
+//                                        ->columnSpan(2)
+//                                        ->options([
+//                                            'A+' => 'A+',
+//                                            'A-' => 'A-',
+//                                            'B+' => 'B+',
+//                                            'B-' => 'B-',
+//                                            'AB+' => 'AB+',
+//                                            'AB-' => 'AB-',
+//                                            'O+' => 'O+',
+//                                            'O-' => 'O-',
+//                                        ]),
                                     Select::make('marital_status')
                                         ->label('Estado Civil')
-                                        ->columnSpan(2)
+                                        ->columnSpan(3)
                                         ->required()
                                         ->options([
                                             'solteiro' => 'Solteiro(a)',
@@ -216,7 +219,7 @@ class UserResource extends Resource
                                         ]),
                                     Select::make('education_level')
                                         ->required()
-                                        ->columnSpan(2)
+                                        ->columnSpan(3)
                                         ->label('Nível de Escolaridade')
                                         ->options([
                                             'fundamental' => 'Fundamental',
@@ -226,104 +229,114 @@ class UserResource extends Resource
                                             'mestrado' => 'Mestrado',
                                             'doutorado' => 'Doutorado'
                                         ]),
-                                ]),
-                            ]), // fim Step 1
+                                ])//fim grid step 1
+
+                            ]),
+
+                        // fim Step 1
                         Wizard\Step::make('Contatos') //passo 2
-                            ->schema([
-                                Repeater::make('contacts')
-                                    ->label('Contatos')
-                                    ->relationship('phone')
-                                    ->schema([
-                                        Grid::make(3)->schema([ // Organizando em 4 colunas
-                                            TextInput::make('number')
-                                                ->label('Telefone')
-                                                ->required()
-                                                ->placeholder('(xx)xxxxx-xxxx')
-                                                ->mask('(99)99999-9999')
-                                                ->dehydrateStateUsing(fn($state) => preg_replace('/[^0-9]/', '', $state)), // Remove caracteres não numéricos
-                                            Select::make('type')
-                                                ->label('Tipo de contato')
-                                                ->required()
-                                                ->options([
-                                                    'Celular' => 'Celular',
-                                                    'Residencial' => 'Residencial',
-                                                    'Comercial' => 'Comercial',
-                                                ]),
-                                            TextInput::make('observation')
-                                                ->label('Observação')
-                                                ->maxLength(255),
-                                        ]),
-                                    ])
-                                    ->columns(1) // Define uma repetição por linha
-
-                            ]),//fim Passo 2: Informações de endereço
-                        Wizard\Step::make('Endereço') //passo 3
-                            ->schema([
-                                Forms\Components\Grid::make() // Organizando o layout em duas colunas
+                        ->schema([
+                            Repeater::make('contacts')
+                                ->label('Contatos')
+                                ->addActionLabel('Adicionar Novo Contato')
+                                ->relationship('phone')
                                 ->schema([
-                                    Fieldset::make('Endereço')
-                                        ->relationship('address', 'address')
-                                        ->schema([
-                                            TextInput::make('zip_code')
-                                                ->label('CEP')
-                                                ->suffixAction(
-                                                    fn($state, $set) => Action::make('search-action')
-                                                        ->icon('heroicon-o-magnifying-glass')
-                                                        ->action(function () use ($state, $set) {
-                                                            if (blank($state || strlen($state) < 9)) {
-                                                                Notification::make()
-                                                                    ->title('Digite o CEP completo para buscar o endereço')
-                                                                    ->danger()
-                                                                    ->send();
-                                                                return;
-                                                            }
+                                    Grid::make(3)->schema([ // Organizando em 4 colunas
+                                        TextInput::make('number')
+                                            ->label('Telefone')
+                                            ->required()
+                                            ->placeholder('(xx)xxxxx-xxxx')
+                                            ->mask('(99)99999-9999')
+                                            ->dehydrateStateUsing(fn($state) => preg_replace('/[^0-9]/', '', $state)), // Remove caracteres não numéricos
+                                        Select::make('type')
+                                            ->label('Tipo de contato')
+                                            ->required()
+                                            ->default('Celular')
+                                            ->options([
+                                                'Celular' => 'Celular',
+                                                'Residencial' => 'Residencial',
+                                                'Comercial' => 'Comercial',
+                                            ]),
+                                        TextInput::make('observation')
+                                            ->label('Observação')
+                                            ->maxLength(255),
+                                    ]),
+                                ])->columns(1) // Define uma repetição por linha
 
-                                                            try {
-                                                                $cepData = Http::withoutVerifying() // Desabilita a verificação do SSL
+                        ]),//fim Passo 2: Informações de endereço
+                        Wizard\Step::make('Endereço')
+                            ->schema([
+                                Fieldset::make('Endereço')
+                                    ->relationship('address', 'address')
+                                    ->schema([
+                                        TextInput::make('zip_code')
+                                            ->label('CEP')
+                                            ->columnSpan(3)
+                                            ->placeholder('xxxxx-xxx')
+                                            ->suffixAction(
+                                                fn($state, $set) => Action::make('search-action')
+                                                    ->icon('heroicon-o-magnifying-glass')
+                                                    ->action(function () use ($state, $set) {
+                                                        if (blank($state || strlen($state) < 9)) {
+                                                            Notification::make()
+                                                                ->title('Digite o CEP completo para buscar o endereço')
+                                                                ->danger()
+                                                                ->send();
+                                                            return;
+                                                        }
+
+                                                        try {
+                                                            $cepData = Http::withoutVerifying()
                                                                 ->get("https://viacep.com.br/ws/{$state}/json/")
-                                                                    ->throw()
-                                                                    ->json();
-                                                            } catch (\Exception $e) {
-                                                                Notification::make()
-                                                                    ->title('Erro ao buscar o CEP. Verifique se o CEP está correto e tente novamente.')
-                                                                    ->danger()
-                                                                    ->send();
-                                                                return;
-                                                            }
+                                                                ->throw()
+                                                                ->json();
+                                                        } catch (\Exception $e) {
+                                                            Notification::make()
+                                                                ->title('Erro ao buscar o CEP. Verifique se o CEP está correto e tente novamente.')
+                                                                ->danger()
+                                                                ->send();
+                                                            return;
+                                                        }
 
-                                                            $set('neighborhood', $cepData['bairro'] ?? null);
-                                                            $set('street', $cepData['logradouro'] ?? null);
-                                                            $set('city', $cepData['localidade'] ?? null); // Correção: cidade é 'localidade'
-                                                            $set('state', $cepData['uf'] ?? null); // Correção: estado é 'uf'
-                                                        })
-                                                )
-                                                ->mask('99999-999'),
-                                            TextInput::make('state')
-                                                ->label('Estado')
-                                                ->required()
-                                                ->maxLength(255),
-                                            TextInput::make('city')
-                                                ->label('Cidade')
-                                                ->required()
-                                                ->maxLength(255),
-                                            TextInput::make('neighborhood')
-                                                ->label('Bairro')
-                                                ->required()
-                                                ->maxLength(255),
-                                            TextInput::make('street')
-                                                ->label('Logradouro')
-                                                ->required()
-                                                ->maxLength(255),
-                                            TextInput::make('number')
-                                                ->label('Número')
-                                                ->required()
-                                                ->maxLength(255),
-                                            TextInput::make('complement')
-                                                ->label('Complemento')
-                                                ->maxLength(255),
-                                        ])
-                                ])
-                            ]), //fim passo 3
+                                                        $set('neighborhood', $cepData['bairro'] ?? null);
+                                                        $set('street', $cepData['logradouro'] ?? null);
+                                                        $set('city', $cepData['localidade'] ?? null);
+                                                        $set('state', $cepData['uf'] ?? null);
+                                                    })
+                                            )
+                                            ->mask('99999-999'),
+                                        TextInput::make('state')
+                                            ->label('Estado')
+                                            ->columnSpan(3)
+                                            ->required()
+                                            ->maxLength(255),
+                                        TextInput::make('city')
+                                            ->label('Cidade')
+                                            ->columnSpan(3)
+                                            ->required()
+                                            ->maxLength(255),
+                                        TextInput::make('neighborhood')
+                                            ->label('Bairro')
+                                            ->columnSpan(3)
+                                            ->required()
+                                            ->maxLength(255),
+                                        TextInput::make('street')
+                                            ->label('Logradouro')
+                                            ->columnSpan(3)
+                                            ->required()
+                                            ->maxLength(255),
+                                        TextInput::make('number')
+                                            ->label('Número')
+                                            ->columnSpan(3)
+                                            ->required()
+                                            ->maxLength(255),
+                                        TextInput::make('complement')
+                                            ->label('Complemento')
+                                            ->columnSpan(5)
+                                            ->maxLength(255),
+                                    ])->columns(12)
+
+                            ]), // fim passo 3
 
                         // Passo 4: Informações de Acesso
                         Wizard\Step::make('Informações de Acesso')
@@ -348,6 +361,15 @@ class UserResource extends Resource
                                     TextInput::make('password')
                                         ->label('Senha')
                                         ->password()
+                                        ->helperText(function ($operation){
+                                            if ($operation == 'create'){
+                                                return 'Caso a senha não seja informada, o CPF será a senha padrão.';
+                                            }
+                                            if ($operation == 'edit'){
+                                                return 'Caso a senha não seja informada, a senha não será alterada.';
+                                            }
+                                            return '';
+                                        })
                                         ->maxLength(255)
                                         //->dehydrateStateUsing(fn($state) => filled($state) ? bcrypt($state) : null) // Criptografa a senha somente se fornecida
                                         ->required(false) // Torna o campo não obrigatório
@@ -363,73 +385,74 @@ class UserResource extends Resource
                                     ,
                                 ]),
                             ]), //fecha step 4
-                            Wizard\Step::make('Associados') //passo 5
+                        Wizard\Step::make('Associados') //passo 5
+                        ->schema([
+                            Fieldset::make('Informações sobre o Associado')
+                                ->relationship('associate', 'associate')
                                 ->schema([
-                                    Fieldset::make('Informações sobre o Associado')
-                                    ->relationship('associate', 'associate')
-                                    ->schema([
-                                        TextInput::make('enrollment')
-                                            ->label('Matrícula')
-                                            ->required()
-                                            ->maxLength(255)
-                                            ->columnSpan(1),
+                                    TextInput::make('enrollment')
+                                        ->label('Matrícula')
+                                        ->required()
+                                        ->maxLength(255)
+                                        ->columnSpan(3),
 
-                                        Select::make('associated_type_id')
-                                            ->label('Tipo de Membro')
-                                            ->relationship('associated_type', 'name')
-                                            ->required()
-                                            ->preload()
-                                            ->columnSpan(1),
+                                    Select::make('associated_type_id')
+                                        ->label('Tipo de Membro')
+                                        ->relationship('associated_type', 'name')
+                                        ->required()
+                                        ->preload()
+                                        ->columnSpan(3),
 
-                                        Select::make('position_id')
-                                            ->label('Cargo')
-                                            ->required()
-                                            ->relationship('position', 'name')
-                                            ->columnSpan(1),
+                                    Select::make('position_id')
+                                        ->label('Cargo')
+                                        ->required()
+                                        ->relationship('position', 'name')
+                                        ->columnSpan(3),
 
-                                        Forms\Components\ToggleButtons::make('is_active')
-                                            ->label('Associado Ativo?')
-                                            ->required()
-                                            ->columnSpan(1)
-                                            ->default(true)
-                                            ->inline()
-                                            ->options([
-                                                '0' => 'Não',
-                                                '1' => 'Sim',
-                                            ])
-                                            ->icons([
-                                                '0' => 'heroicon-o-x-mark',
-                                                '1' => 'heroicon-o-check',
-                                            ])
-                                            ->colors([
-                                                '0' => 'danger',
-                                                '1' => 'success',
-                                            ]),
-                                        Repeater::make('associationPeriods')
-                                            ->label('Tempo de Associado')
-                                            ->relationship('associationPeriods') // Define o relacionamento
-                                            ->schema([
-                                                DatePicker::make('start_date')
-                                                    ->label('Data de Início')
-                                                    ->required(),
+                                    Forms\Components\ToggleButtons::make('is_active')
+                                        ->label('Associado Ativo?')
+                                        ->required()
+                                        ->columnSpan(3)
+                                        ->default(true)
+                                        ->inline()
+                                        ->options([
+                                            '0' => 'Não',
+                                            '1' => 'Sim',
+                                        ])
+                                        ->icons([
+                                            '0' => 'heroicon-o-x-mark',
+                                            '1' => 'heroicon-o-check',
+                                        ])
+                                        ->colors([
+                                            '0' => 'danger',
+                                            '1' => 'success',
+                                        ]),
+                                    Repeater::make('associationPeriods')
+                                        ->label('Tempo de Associado')
+                                        ->addActionLabel('Adicionar Período')
+                                        ->relationship('associationPeriods') // Define o relacionamento
+                                        ->schema([
+                                            DatePicker::make('start_date')
+                                                ->label('Data de Início')
+                                                ->required(),
 
-                                                DatePicker::make('end_date')
-                                                    ->label('Data de Término')
-                                                    ->nullable(),
-                                            ])->columnSpan(2)->columns(2),
+                                            DatePicker::make('end_date')
+                                                ->label('Data de Término')
+                                                ->nullable(),
+                                        ])->columnSpan(4)->columns(2),
 
-                                    ])->columns(4),
+                                ])->columns(12),
 
-                                Fieldset::make('Convênios do Associado')
-                                    ->schema([
-                                        Select::make('agreements')
-                                            ->label('Convênios')
-                                            ->multiple() // Permite selecionar vários convênios
-                                            ->relationship('agreements', 'name') // Apenas relaciona sem criar novos registros
-                                            ->preload()
-                                            ->searchable(),
-                                    ])
-                                ]) ,
+                            Fieldset::make('Convênios do Associado')
+                                ->schema([
+                                    Select::make('agreements')
+                                        ->label('Convênios')
+                                        ->multiple() // Permite selecionar vários convênios
+                                        ->relationship('agreements', 'name') // Apenas relaciona sem criar novos registros
+                                        ->preload()
+                                        ->searchable(),
+                                ])
+                        ]),
                     ])->startOnStep(1)->skippable(), //fecha wizard
 
                 ]),  //fecha grid
@@ -455,7 +478,7 @@ class UserResource extends Resource
                     ->searchable()
                     ->sortable()
                     ->badge()
-                    ->color(fn ($record) => match ($record->associate->associated_type->name) {
+                    ->color(fn($record) => match ($record->associate->associated_type->name) {
                         'Efetivo' => 'success',
                         'Comissionado' => 'primary',
                         'Disposição' => 'info',
@@ -465,8 +488,7 @@ class UserResource extends Resource
                     ->label('CPF')
                     ->copyable()
                     ->searchable()
-                    ->formatStateUsing(fn ($state) =>
-                        substr($state, 0, 3) . '.' .
+                    ->formatStateUsing(fn($state) => substr($state, 0, 3) . '.' .
                         substr($state, 3, 3) . '.' .
                         substr($state, 6, 3) . '-' .
                         substr($state, 9, 2)
@@ -489,9 +511,8 @@ class UserResource extends Resource
                     ->color('success') // Cor opcional para destacar o ícone
                     ->label('Telefone')
                     ->searchable()
-                    ->formatStateUsing(fn ($state) =>
-                    preg_replace('/^(\d{2})(\d{4,5})(\d{4})$/', '($1) $2-$3', $state))
-                    ->url(fn ($record) => $record->phone
+                    ->formatStateUsing(fn($state) => preg_replace('/^(\d{2})(\d{4,5})(\d{4})$/', '($1) $2-$3', $state))
+                    ->url(fn($record) => $record->phone
                         ? 'https://api.whatsapp.com/send/?phone=55' . preg_replace('/[^0-9]/', '', $record->phone->number)
                         : null
                     )
@@ -534,7 +555,26 @@ class UserResource extends Resource
             ->actions([
                 //Tables\Actions\ViewAction::make(),
                 Tables\Actions\EditAction::make(),
-                Tables\Actions\DeleteAction::make(),
+                Tables\Actions\DeleteAction::make()
+                    ->requiresConfirmation()
+                    ->action(function ($record) {
+                        //dd($record);
+                        if($record->employee){
+                            return Notification::make()
+                                ->title('Não é possível excluir um associado que é funcionário.')
+                                ->danger()
+                                ->send();
+                        }elseif($record->associate){
+                            $record->associate->delete();
+                            $record->removeRole('Associate');
+                            return Notification::make()
+                                ->title('Associado removido com sucesso.')
+                                ->success()
+                                ->send();
+                        }
+                        return false;
+                    })
+                ,
                 Tables\Actions\Action::make('sendEmail')
                     ->label('Enviar E-mail')
                     ->icon('heroicon-o-envelope')
@@ -591,7 +631,7 @@ class UserResource extends Resource
                         })
                         ->requiresConfirmation(),
                     Tables\Actions\DeleteBulkAction::make()
-                    ->label('Excluir Registros Selecionados')
+                        ->label('Excluir Registros Selecionados')
                     ,
                 ]),
             ]);

@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\DB;
 class BirthdaysThisMonth extends BaseWidget
 {
     protected static ?int $sort = 2;
+    protected static bool $isLazy = false;
     protected static ?string $heading = 'Aniversariantes do Mês';
 
     public function table(Table $table): Table
