@@ -61,7 +61,7 @@ class CreateUser extends CreateRecord
             // Notificar o usuário que o registro foi atualizado
             \Filament\Notifications\Notification::make()
                 ->title('Usuário atualizado com sucesso!')
-                ->body('O CPF já está vinculado a um funcionário. Informações de associado foram atualizadas.')
+                ->body('O CPF já estava cadastrado. Informações de associado foram atualizadas.')
                 ->success()
                 ->send();
 

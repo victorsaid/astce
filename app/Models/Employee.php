@@ -15,6 +15,7 @@ class Employee extends Model
         'document',
         'hire_date',
         'salary',
+        'position',
     ];
 
     public function user()

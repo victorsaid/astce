@@ -66,7 +66,8 @@
             <td class="assinatura">
                 <br><br><br><br><br><br>
                 <div class="linha-assinatura"></div>
-                <p><strong>{{$employee->name}} e Cargo do Responsável</strong></p>
+                <p><strong>{{$employee->name}}</strong></p>
+                <p>{{$employee->employee->position}}</p>
             </td>
         </tr>
     </table>

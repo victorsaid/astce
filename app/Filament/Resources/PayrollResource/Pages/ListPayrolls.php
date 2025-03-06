@@ -11,10 +11,19 @@ class ListPayrolls extends ListRecords
 {
     protected static string $resource = PayrollResource::class;
 
+
+
     protected function getHeaderWidgets(): array
     {
         return [
-            PayrollResource\Widgets\PayrollStatus::class,
+            PayrollResource\Widgets\PayrollHeaderWidget::class,
+        ];
+    }
+
+    protected function getFooterWidgets(): array
+    {
+        return [
+            PayrollResource\Widgets\PayrollFooterWidget::class,
         ];
     }
 

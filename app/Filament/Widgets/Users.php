@@ -10,6 +10,7 @@ use Filament\Widgets\TableWidget as BaseWidget;
 class Users extends BaseWidget
 {
     protected static ?int $sort = 1;
+    protected static bool $isLazy = false;
     protected static ?string $heading = 'Últimos Associados';
 
 

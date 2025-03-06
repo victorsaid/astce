@@ -2,6 +2,8 @@
 
 namespace App\Providers\Filament;
 
+use App\Filament\Resources\PayrollResource\Widgets\PayrollFooterWidget;
+use App\Filament\Resources\PayrollResource\Widgets\PayrollHeaderWidget;
 use App\Filament\Widgets\Agreements;
 use App\Filament\Widgets\AssociateTotal;
 use App\Filament\Widgets\Users;
@@ -12,6 +14,7 @@ use Filament\Pages;
 use Filament\Panel;
 use Filament\PanelProvider;
 use Filament\Support\Colors\Color;
+use Filament\Support\Enums\MaxWidth;
 use Filament\Widgets;
 use Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse;
 use Illuminate\Cookie\Middleware\EncryptCookies;
@@ -34,6 +37,7 @@ class AdminPanelProvider extends PanelProvider
                 'primary' => Color::Amber,
             ])
             ->profile()
+            ->maxContentWidth(MaxWidth::Full)
             ->passwordReset()
             ->sidebarCollapsibleOnDesktop()
             ->brandLogo(asset('storage/logo/logo_astce.jpeg'))
