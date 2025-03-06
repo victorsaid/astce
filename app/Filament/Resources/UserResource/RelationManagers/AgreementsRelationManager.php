@@ -56,15 +56,15 @@ class AgreementsRelationManager extends RelationManager
                     ->sortable()
                     ->searchable(),
 
-                Tables\Columns\TextColumn::make('type')
+                Tables\Columns\TextColumn::make('category')
                     ->label('Tipo')
                     ->sortable()
                     ->searchable(),
             ])
             ->filters([
-                SelectFilter::make('type')
+                SelectFilter::make('category')
                     ->label('Filtrar por Tipo')
-                    ->options(Agreements::query()->pluck('type', 'type')->toArray()),
+                    ->options(Agreements::query()->pluck('category', 'category')->toArray()),
             ])
             ->headerActions([
                 AttachAction::make()

@@ -19,29 +19,30 @@ class PayrollHeaderWidget extends BaseWidget
         $totalYear = Payroll::whereYear('date', now()->year)->sum('total');
         $totalPayments = Payroll::sum('total');
 
-        $paymentsByType = PayrollPayment::where('payroll_id', $lastPayroll->id ?? null)
-            ->join('users', 'payroll_payments.user_id', '=', 'users.id')
-            ->join('associates', 'users.id', '=', 'associates.user_id')
-            ->selectRaw('associates.associated_type_id, SUM(payroll_payments.amount) as total')
+        $paymentsByType = PayrollPayment::where('payroll_payments.payroll_id', $lastPayroll->id ?? null)
+            ->join('associates', 'payroll_payments.user_id', '=', 'associates.user_id') // 🔹 Pulamos a tabela "users"
+            ->selectRaw('associates.associated_type_id AS type_id, SUM(payroll_payments.amount) as total')
             ->groupBy('associates.associated_type_id')
-            ->pluck('total', 'associated_type_id');
+            ->orderBy('type_id')
+            ->get()
+            ->pluck('total', 'type_id');
+
 
         $types = [
             1 => 'Efetivos',
-            2 => 'Disposição',
-            3 => 'Comissionados',
-            4 => 'Aposentados',
+            2 => 'Comissionado',
+            3 => 'Aposentado',
+            4 => 'À disposição',
         ];
 
         $paymentSummary = collect($types)->map(function ($label, $id) use ($paymentsByType) {
-            return "$label: R$ " . number_format($paymentsByType[$id] ?? 0, 2, ',', '.');
+            return "$label: R$ " . number_format($paymentsByType->get($id, 0), 2, ',', '.');
         })->implode(" | ");
 
         return [
             Card::make('Última Folha de Pagamento', $lastPayroll ? 'R$ ' . number_format($lastPayroll->total, 2, ',', '.') : 'Nenhum registro')
                 ->description($lastPayroll ? 'Mês: ' . $lastPayroll->date->translatedFormat('F Y') . " | " . $paymentSummary : 'Nenhuma folha encontrada')
-                ->color($lastPayroll ? 'success' : 'danger')
-                ->extraAttributes(['style' => 'width: 100%; max-width: 600px; font-size: 14px;']),
+                ->color($lastPayroll ? 'success' : 'danger'),
             Card::make('Total Arrecadado em ' . now()->year, 'R$ ' . number_format($totalYear, 2, ',', '.'))
                 ->description('Total arrecadado no ano atual')
                 ->color($totalYear > 0 ? 'info' : 'warning'),

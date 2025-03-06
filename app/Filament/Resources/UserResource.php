@@ -553,7 +553,8 @@ class UserResource extends Resource
                     ->preload(), // Carrega os nomes no dropdown
             ])
             ->actions([
-                //Tables\Actions\ViewAction::make(),
+                Tables\Actions\ViewAction::make()
+                ->label('Ver'),
                 Tables\Actions\EditAction::make(),
                 Tables\Actions\DeleteAction::make()
                     ->requiresConfirmation()
