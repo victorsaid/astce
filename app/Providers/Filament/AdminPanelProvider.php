@@ -37,7 +37,7 @@ class AdminPanelProvider extends PanelProvider
                 'primary' => Color::Amber,
             ])
             ->profile()
-            ->maxContentWidth(MaxWidth::Full)
+            //->maxContentWidth(MaxWidth::Full)
             ->passwordReset()
             ->sidebarCollapsibleOnDesktop()
             ->brandLogo(asset('storage/logo/logo_astce.jpeg'))

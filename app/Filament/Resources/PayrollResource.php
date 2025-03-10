@@ -26,6 +26,7 @@ use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\Grid;
 use Illuminate\Support\Number;
 use Filament\Forms\Components\TableRepeater;
+use Laravel\Prompts\SearchPrompt;
 
 class PayrollResource extends Resource
 {
@@ -77,6 +78,45 @@ class PayrollResource extends Resource
                         'style' => 'max-height: 700px; overflow-y: auto;', // Limita a altura e ativa scroll interno
                     ])
                     ->schema([
+
+                        TextInput::make('search')
+                            ->label('Pesquisar Pagamento')
+                            ->placeholder('Digite o nome do associado ou valor')
+                            ->extraAttributes(['style' => 'margin-bottom: 20px;'])
+                            ->columnSpan(12)
+                            ->reactive()
+                            ->debounce(1500)
+                            ->prefixIcon('heroicon-o-magnifying-glass')
+                            ->afterStateUpdated(function ($state, callable $set, callable $get) {
+                                // Recupera os pagamentos originais
+                                $originalPayments = $get('originalPayments') ?? $get('payments');
+
+                                if (!$originalPayments) {
+                                    return;
+                                }
+
+                                // Se o campo de pesquisa estiver vazio, restaura os pagamentos originais
+                                if (empty($state)) {
+                                    $set('payments', $originalPayments);
+                                    return;
+                                }
+
+                                // Filtragem dos pagamentos
+                                $filteredPayments = collect($originalPayments)->filter(function ($payment) use ($state) {
+                                    $user = User::find($payment['user_id']);
+                                    return str_contains(strtolower($payment['associated_type'] ?? ''), strtolower($state)) ||
+                                        str_contains(strtolower($payment['amount'] ?? ''), strtolower($state)) ||
+                                        ($user && str_contains(strtolower($user->name ?? ''), strtolower($state)));
+                                })->values()->toArray();
+
+                                // Atualiza a lista filtrada
+                                $set('payments', $filteredPayments);
+
+                                // Armazena os pagamentos originais se ainda não tiver sido feito
+                                if (!$get('originalPayments')) {
+                                    $set('originalPayments', $originalPayments);
+                                }
+                            }),
                         Repeater::make('payments')
                             ->columnSpan(12)
                             ->columns(12)
@@ -85,6 +125,7 @@ class PayrollResource extends Resource
                             ->addActionLabel('Adicionar Pagamento')
                             ->relationship('payments')
                             ->defaultItems(3)
+                            ->extraAttributes(['style'=>'color: red;'])
                             ->schema([
                                 Select::make('user_id')
                                     ->label('Associado')
