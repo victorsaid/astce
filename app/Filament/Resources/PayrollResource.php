@@ -25,6 +25,7 @@ use Filament\Forms\Components\Fieldset;
 use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\Grid;
 use Illuminate\Support\Number;
+use Filament\Forms\Components\TableRepeater;
 
 class PayrollResource extends Resource
 {
@@ -42,16 +43,17 @@ class PayrollResource extends Resource
                 TextInput::make('name')
                 ->label('Nome')
                 ->required()
-                ->columnSpan(2)
+                ->columnSpan(6)
                 ->maxLength(255),
                 DatePicker::make('date')
                     ->label('Data')
+                    ->columnSpan(2)
                     ->required()
                     ->date(),
 
                 Forms\Components\Placeholder::make('total')
                     ->label('Total')
-
+                    ->columnSpan(4)
                     ->content(function (Forms\Get $get, Forms\Set $set) {
                         $total = 0;
                         if (!$repeaters = $get('payments')) {
@@ -68,15 +70,21 @@ class PayrollResource extends Resource
                 Forms\Components\Hidden::make('total')
                     ->label('Total'),
 
+
                 Fieldset::make('Pagamentos')
-                    ->columns(1)
+                    ->columnSpan(12)
+                    ->extraAttributes([
+                        'style' => 'max-height: 700px; overflow-y: auto;', // Limita a altura e ativa scroll interno
+                    ])
                     ->schema([
                         Repeater::make('payments')
-                            ->columns(5)
+                            ->columnSpan(12)
+                            ->columns(12)
                             ->label('Todos os Associados')
                             ->hiddenLabel()
                             ->addActionLabel('Adicionar Pagamento')
                             ->relationship('payments')
+                            ->defaultItems(3)
                             ->schema([
                                 Select::make('user_id')
                                     ->label('Associado')
@@ -90,7 +98,7 @@ class PayrollResource extends Resource
                                             ->toArray()
                                     )
                                     ->required()
-                                    ->columnSpan(3)
+                                    ->columnSpan(8)
                                     ->reactive()
                                     ->afterStateUpdated(fn ($state, callable $set) =>
                                     $set('associated_type', User::find($state)?->associate->associated_type?->name ?? 'N/A')
@@ -101,14 +109,14 @@ class PayrollResource extends Resource
                                     ->label('Tipo de Associado')
                                     ->hiddenLabel()
                                     ->readOnly() // O campo será preenchido automaticamente
-                                    ->columnSpan(1), // Ocupa apenas uma coluna
+                                    ->columnSpan(2), // Ocupa apenas uma coluna
 
                                 TextInput::make('amount')
                                     ->label('Valor')
                                     ->prefix('R$')
                                     ->hiddenLabel()
                                     ->numeric()
-                                    ->columnSpan(1)
+                                    ->columnSpan(2)
                                     ->required()
                                     ->reactive()
                                     ->live(debounce: 1500),
@@ -134,9 +142,9 @@ class PayrollResource extends Resource
                                     ])
                                     ->toArray();
                             }),
-                    ]),
+                    ]),//fim fieldset
 
-            ])->columns(4);
+            ])->columns(12);
     }
 
     public static function table(Table $table): Table
