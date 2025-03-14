@@ -31,8 +31,8 @@ use Laravel\Prompts\SearchPrompt;
 class PayrollResource extends Resource
 {
     protected static ?string $model = Payroll::class;
-     protected static ?string $modelLabel = 'Folha de Pagamento';
-     protected static ?string $navigationLabel = 'Folha de Pagamento';
+    protected static ?string $modelLabel = 'Folha de Pagamento';
+    protected static ?string $navigationLabel = 'Folha de Pagamento';
     protected static ?string $pluralModelLabel = 'Folhas de Pagamento';
 
     protected static ?string $navigationIcon = 'heroicon-o-banknotes';
@@ -42,10 +42,10 @@ class PayrollResource extends Resource
         return $form
             ->schema([
                 TextInput::make('name')
-                ->label('Nome')
-                ->required()
-                ->columnSpan(6)
-                ->maxLength(255),
+                    ->label('Nome')
+                    ->required()
+                    ->columnSpan(6)
+                    ->maxLength(255),
                 DatePicker::make('date')
                     ->label('Data')
                     ->columnSpan(2)
@@ -78,54 +78,53 @@ class PayrollResource extends Resource
                         'style' => 'max-height: 700px; overflow-y: auto;', // Limita a altura e ativa scroll interno
                     ])
                     ->schema([
-
-                        TextInput::make('search')
-                            ->label('Pesquisar Pagamento')
-                            ->placeholder('Digite o nome do associado ou valor')
-                            ->extraAttributes(['style' => 'margin-bottom: 20px;'])
-                            ->columnSpan(12)
-                            ->reactive()
-                            ->debounce(1500)
-                            ->prefixIcon('heroicon-o-magnifying-glass')
-                            ->afterStateUpdated(function ($state, callable $set, callable $get) {
-                                // Recupera os pagamentos originais
-                                $originalPayments = $get('originalPayments') ?? $get('payments');
-
-                                if (!$originalPayments) {
-                                    return;
-                                }
-
-                                // Se o campo de pesquisa estiver vazio, restaura os pagamentos originais
-                                if (empty($state)) {
-                                    $set('payments', $originalPayments);
-                                    return;
-                                }
-
-                                // Filtragem dos pagamentos
-                                $filteredPayments = collect($originalPayments)->filter(function ($payment) use ($state) {
-                                    $user = User::find($payment['user_id']);
-                                    return str_contains(strtolower($payment['associated_type'] ?? ''), strtolower($state)) ||
-                                        str_contains(strtolower($payment['amount'] ?? ''), strtolower($state)) ||
-                                        ($user && str_contains(strtolower($user->name ?? ''), strtolower($state)));
-                                })->values()->toArray();
-
-                                // Atualiza a lista filtrada
-                                $set('payments', $filteredPayments);
-
-                                // Armazena os pagamentos originais se ainda não tiver sido feito
-                                if (!$get('originalPayments')) {
-                                    $set('originalPayments', $originalPayments);
-                                }
-                            }),
+//                        TextInput::make('search')
+//                            ->label('Pesquisar Pagamento')
+//                            ->placeholder('Digite o nome do associado ou valor')
+//                            ->extraAttributes(['style' => 'margin-bottom: 20px;'])
+//                            ->columnSpan(12)
+//                            ->reactive()
+//                            ->live()
+//                            ->debounce(1500)
+//                            ->prefixIcon('heroicon-o-magnifying-glass')
+//                            ->afterStateUpdated(function ($state, callable $set, callable $get) {
+//                                // Recupera os pagamentos originais
+//                                $originalPayments = $get('originalPayments') ?? $get('payments');
+//
+//                                if (!$originalPayments) {
+//                                    return;
+//                                }
+//
+//                                // Se a pesquisa estiver vazia, exibe todos os pagamentos sem alterar valores
+//                                if (empty($state)) {
+//                                    $set('filteredPayments', []);
+//                                    return;
+//                                }
+//
+//                                // Filtragem dos pagamentos sem modificar `payments`
+//                                $filteredPayments = collect($originalPayments)->filter(function ($payment) use ($state) {
+//                                    $user = User::find($payment['user_id']);
+//                                    return str_contains(strtolower($payment['associated_type'] ?? ''), strtolower($state)) ||
+//                                        str_contains(strtolower($payment['amount'] ?? ''), strtolower($state)) ||
+//                                        ($user && str_contains(strtolower($user->name ?? ''), strtolower($state)));
+//                                })->pluck('user_id')->toArray();
+//
+//                                // Apenas armazena os IDs dos registros filtrados, sem alterar `payments`
+//                                $set('filteredPayments', $filteredPayments);
+//
+//                                // Armazena os pagamentos originais se ainda não tiver sido feito
+//                                if (!$get('originalPayments')) {
+//                                    $set('originalPayments', $originalPayments);
+//                                }
+//                            }),
                         Repeater::make('payments')
                             ->columnSpan(12)
                             ->columns(12)
                             ->label('Todos os Associados')
+                            ->reactive()
                             ->hiddenLabel()
                             ->addActionLabel('Adicionar Pagamento')
                             ->relationship('payments')
-                            ->defaultItems(3)
-                            ->extraAttributes(['style'=>'color: red;'])
                             ->schema([
                                 Select::make('user_id')
                                     ->label('Associado')
@@ -142,14 +141,19 @@ class PayrollResource extends Resource
                                     ->columnSpan(8)
                                     ->reactive()
                                     ->afterStateUpdated(fn ($state, callable $set) =>
-                                    $set('associated_type', User::find($state)?->associate->associated_type?->name ?? 'N/A')
+                                    $set('enrollment', User::find($state)?->associate->enrollment ?? 'N/A')
                                     )
                                     ->disableOptionsWhenSelectedInSiblingRepeaterItems(),
 
-                                TextInput::make('associated_type')
-                                    ->label('Tipo de Associado')
-                                    ->hiddenLabel()
-                                    ->readOnly() // O campo será preenchido automaticamente
+                                TextInput::make('enrollment')
+                                    ->label('Matricula')
+                                    ->disabled()
+                                    ->prefix('Matricula:')
+                                    ->afterStateUpdated(fn ($state, callable $set) =>
+                                    $set('enrollment', User::find($state)?->associate->enrollment ?? 'N/A')
+                                    )
+                                    ->reactive()
+                                    ->hiddenLabel() // O campo será preenchido automaticamente
                                     ->columnSpan(2), // Ocupa apenas uma coluna
 
                                 TextInput::make('amount')
@@ -162,7 +166,8 @@ class PayrollResource extends Resource
                                     ->reactive()
                                     ->live(debounce: 1500),
                             ])
-                            ->default(function () {
+                            ->default(function ($get) {
+
                                 // Busca a última folha de pagamento existente
                                 $lastPayroll = \App\Models\Payroll::latest('name')->first();
 
@@ -178,11 +183,17 @@ class PayrollResource extends Resource
                                     ->get()
                                     ->map(fn ($user) => [
                                         'user_id' => $user->id,
-                                        'associated_type' => $user->associate->associated_type?->name ?? 'N/A',
-                                        'amount' => $previousPayments[$user->id] ?? 0, // Se houver valor do mês passado, usa; senão, começa com 0
+                                        'enrollment' => $user->associate->enrollment ?? 'N/A',
+                                        'amount' => $previousPayments[$user->id] ?? 0, // Mantém os valores anteriores sem sobrescrever
                                     ])
                                     ->toArray();
-                            }),
+                            })
+
+
+
+                        ,
+
+
                     ]),//fim fieldset
 
             ])->columns(12);
@@ -194,8 +205,8 @@ class PayrollResource extends Resource
             ->defaultSort('date', 'desc')
             ->columns([
                 TextColumn::make('name')->label('Nome')
-                ->searchable()
-                ->sortable(),
+                    ->searchable()
+                    ->sortable(),
                 TextColumn::make('date')->label('Data')->date('d/m/Y')->sortable(),
                 TextColumn::make('total')->label('Total')->money('BRL')->badge()->color('success')->sortable(),
             ])

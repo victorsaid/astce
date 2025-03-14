@@ -69,7 +69,9 @@ class PdfController extends Controller
     }
     public function memberDeclaration(User $user)
     {
+        //dd($user);
         $employee = Auth::user();
+        //dd($employee->getRoleNames());
         //dd($employee);
         $pdf = Pdf::loadView('pdf.member_declaration', ['user' => $user, 'employee' => $employee]);
         $pdf->set_option('isRemoteEnabled', true);

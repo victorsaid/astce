@@ -18,14 +18,14 @@ class ViewUser extends ViewRecord
                 ->icon('fas-user-edit'),
 
             Actions\ActionGroup::make([
-                Actions\Action::make('Exportar PDF')
-                    ->label('Exportar PDF')
-                    ->icon('fas-file-pdf')
-                    ->color('danger')
-                    ->requiresConfirmation()
-                    ->action(function () {
-                        return redirect()->route('pdf.users');
-                    }),
+//                Actions\Action::make('Exportar PDF')
+//                    ->label('Exportar PDF')
+//                    ->icon('fas-file-pdf')
+//                    ->color('danger')
+//                    ->requiresConfirmation()
+//                    ->action(function () {
+//                        return redirect()->route('pdf.users');
+//                    }),
                 Actions\Action::make('Declaração de Associado')
                     ->label('Declaração de Associado')
                     ->icon('fas-file-pdf')

@@ -66,8 +66,14 @@
             <td class="assinatura">
                 <br><br><br><br><br><br>
                 <div class="linha-assinatura"></div>
-                <p><strong>{{$employee->name}}</strong></p>
-                <p>{{$employee->employee->position}}</p>
+                <p style="margin-bottom: 2px;"><strong>{{$employee->name}}</strong></p>
+                <p style="margin-top: 2px;">
+                    @if($employee->hasRole('Super_admin'))
+                        <strong>Administrador</strong>
+                    @else
+                        {{$employee->employee->position}}
+                    @endif
+                </p>
             </td>
         </tr>
     </table>
