@@ -387,73 +387,76 @@ class UserResource extends Resource
                             ]), //fecha step 4
                         Wizard\Step::make('Associados') //passo 5
                         ->schema([
-                            Fieldset::make('Informações sobre o Associado')
-                                ->relationship('associate', 'associate')
-                                ->schema([
-                                    TextInput::make('enrollment')
-                                        ->label('Matrícula')
-                                        ->required()
-                                        ->maxLength(255)
-                                        ->columnSpan(3),
+                            Grid::make(12)
+                            ->schema([
+                                Fieldset::make('Informações sobre o Associado')
+                                    ->relationship('associate', 'associate')
+                                    ->schema([
+                                        TextInput::make('enrollment')
+                                            ->label('Matrícula')
+                                            ->required()
+                                            ->maxLength(255)
+                                            ->columnSpan(3),
 
-                                    Select::make('associated_type_id')
-                                        ->label('Tipo de Membro')
-                                        ->relationship('associated_type', 'name')
-                                        ->required()
-                                        ->preload()
-                                        ->columnSpan(3),
+                                        Select::make('associated_type_id')
+                                            ->label('Tipo de Membro')
+                                            ->relationship('associated_type', 'name')
+                                            ->required()
+                                            ->preload()
+                                            ->columnSpan(3),
 
-                                    Select::make('position_id')
-                                        ->label('Cargo')
-                                        ->required()
-                                        ->relationship('position', 'name')
-                                        ->columnSpan(3),
+                                        Select::make('position_id')
+                                            ->label('Cargo')
+                                            ->required()
+                                            ->relationship('position', 'name')
+                                            ->columnSpan(3),
 
-                                    Forms\Components\ToggleButtons::make('is_active')
-                                        ->label('Associado Ativo?')
-                                        ->required()
-                                        ->columnSpan(3)
-                                        ->default(true)
-                                        ->inline()
-                                        ->options([
-                                            '0' => 'Não',
-                                            '1' => 'Sim',
-                                        ])
-                                        ->icons([
-                                            '0' => 'heroicon-o-x-mark',
-                                            '1' => 'heroicon-o-check',
-                                        ])
-                                        ->colors([
-                                            '0' => 'danger',
-                                            '1' => 'success',
-                                        ]),
-                                    Repeater::make('associationPeriods')
-                                        ->label('Tempo de Associado')
-                                        ->addActionLabel('Adicionar Período')
-                                        ->relationship('associationPeriods') // Define o relacionamento
-                                        ->schema([
-                                            DatePicker::make('start_date')
-                                                ->label('Data de Início')
-                                                ->required(),
+                                        Forms\Components\ToggleButtons::make('is_active')
+                                            ->label('Associado Ativo?')
+                                            ->required()
+                                            ->columnSpan(3)
+                                            ->default(true)
+                                            ->inline()
+                                            ->options([
+                                                '0' => 'Não',
+                                                '1' => 'Sim',
+                                            ])
+                                            ->icons([
+                                                '0' => 'heroicon-o-x-mark',
+                                                '1' => 'heroicon-o-check',
+                                            ])
+                                            ->colors([
+                                                '0' => 'danger',
+                                                '1' => 'success',
+                                            ]),
+                                        Repeater::make('associationPeriods')
+                                            ->label('Tempo de Associado')
+                                            ->addActionLabel('Adicionar Período')
+                                            ->relationship('associationPeriods') // Define o relacionamento
+                                            ->schema([
+                                                DatePicker::make('start_date')
+                                                    ->label('Data de Início')
+                                                    ->required(),
 
-                                            DatePicker::make('end_date')
-                                                ->label('Data de Término')
-                                                ->nullable(),
-                                        ])->columnSpan(4)->columns(2),
+                                                DatePicker::make('end_date')
+                                                    ->label('Data de Término')
+                                                    ->nullable(),
+                                            ])->columnSpan(4)->columns(2),
 
-                                ])->columns(12),
+                                    ])->columns(12),
 
-                            Fieldset::make('Convênios do Associado')
-                                ->schema([
-                                    Select::make('agreements')
-                                        ->label('Convênios')
-                                        ->multiple() // Permite selecionar vários convênios
-                                        ->relationship('agreements', 'name') // Apenas relaciona sem criar novos registros
-                                        ->preload()
-                                        ->searchable(),
-                                ])
+                                Fieldset::make('Convênios do Associado')
+                                    ->schema([
+                                        Forms\Components\CheckboxList::make('agreements')
+                                            ->label('Convênios Disponíveis')
+                                            ->relationship('agreements', 'name') // Relacionamento Many-to-Many
+                                            ->options(\App\Models\Agreements::where('is_active', true)->pluck('name', 'id')->toArray()) // Lista apenas os convênios ativos
+                                            ->columns(2)
+                                        , // Permite ativar/desativar todos os itens rapidamente
+                                    ]),
+                            ])
                         ]),
-                    ])->startOnStep(1)->skippable(), //fecha wizard
+                    ])->startOnStep(5)->skippable(), //fecha wizard
 
                 ]),  //fecha grid
             ]); //fecha schema do form
@@ -576,30 +579,30 @@ class UserResource extends Resource
                         return false;
                     })
                 ,
-                Tables\Actions\Action::make('sendEmail')
-                    ->label('Enviar E-mail')
-                    ->icon('heroicon-o-envelope')
-                    ->form([
-                        TextInput::make('subject')
-                            ->label('Assunto')
-                            ->required()
-                            ->maxLength(255),
-                        Textarea::make('message')
-                            ->label('Mensagem')
-                            ->required()
-                            ->rows(5),
-                    ])
-                    ->action(function (array $data, $record): void {
-                        // Envia o e-mail para o registro atual
-                        Mail::to($record->email)->send(new UserMessageMail($data['subject'], $data['message']));
-
-                        // Notificação de sucesso
-                        Notification::make()
-                            ->title('E-mail enviado com sucesso!')
-                            ->success()
-                            ->send();
-                    })
-                    ->requiresConfirmation(),
+//                Tables\Actions\Action::make('sendEmail')
+//                    ->label('Enviar E-mail')
+//                    ->icon('heroicon-o-envelope')
+//                    ->form([
+//                        TextInput::make('subject')
+//                            ->label('Assunto')
+//                            ->required()
+//                            ->maxLength(255),
+//                        Textarea::make('message')
+//                            ->label('Mensagem')
+//                            ->required()
+//                            ->rows(5),
+//                    ])
+//                    ->action(function (array $data, $record): void {
+//                        // Envia o e-mail para o registro atual
+//                        Mail::to($record->email)->send(new UserMessageMail($data['subject'], $data['message']));
+//
+//                        // Notificação de sucesso
+//                        Notification::make()
+//                            ->title('E-mail enviado com sucesso!')
+//                            ->success()
+//                            ->send();
+//                    })
+//                    ->requiresConfirmation(),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
