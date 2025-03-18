@@ -78,6 +78,20 @@ class PdfController extends Controller
 
         return $pdf->stream('member_declaration.blade.php');
     }
+    public function memberDependantsDeclaration(User $user, Request $request)
+    {
+        //dd($request);
+        $employee = Auth::user();
+        $dependants = $request->query('dependant');
+        //dd($dependant);
+        //dd($employee);
+        $pdf = Pdf::loadView('pdf.member_dependants_declaration', ['user' => $user,
+            'dependants' => $dependants,
+            'employee' => $employee]);
+        $pdf->set_option('isRemoteEnabled', true);
+
+        return $pdf->stream('member_declaration.blade.php');
+    }
 
     public function beneficiariesAgreement(Agreements $agreement)
     {

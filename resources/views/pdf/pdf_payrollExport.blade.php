@@ -31,6 +31,17 @@
         p{
             font-size:  10px;
         }
+        .footer {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background-color: #f4f4f4;
+            text-align: center;
+            font-size: 12px;
+            padding: 10px;
+            border-top: 1px solid #ccc;
+        }
     </style>
 </head>
 <body>
@@ -47,8 +58,9 @@
     <thead>
     <tr>
         <th>#</th>
-        <th>Associado</th>
         <th>Matrícula</th>
+        <th>CPF</th>
+        <th>Associado</th>
         <th>Valor</th>
         {{--        <th>Data</th>--}}
     </tr>
@@ -57,17 +69,22 @@
     @foreach ($payments as $payment)
         <tr>
             <td>{{$loop->iteration}}</td>
-            <td>{{ $payment->user->name }}</td>
             <td>{{ $payment->user->associate->enrollment }}</td>
+            <td>{{ $payment->user->document}}</td>
+            <td>{{ $payment->user->name }}</td>
             <td>{{ $payment->amount }}</td>
         </tr>
     @endforeach
     <tr>
-        <td colspan="3" class="text-end"><strong>Total:</strong></td>
+        <td colspan="4" class="text-end"><strong>Total:</strong></td>
         <td><strong>{{ $payroll->total }}</strong></td>
     </tr>
     </tbody>
 
 </table>
+<div class="footer">
+    <p style="margin-bottom: 2px"><strong>Associação dos Servidores do Tribunal de Contas do Estado do Maranhão - ASTCE/MA</strong></p>
+    <p style="margin-top: 2px">Av. Carlos Cunha, s/nº - Jaracaty, São Luís - MA. CEP: 65.076-820 | Tel: (98) 2016-6055 | CNPJ: 05.092.067/0001-17 | Whatsapp: (98) 98271-0176</p>
+</div>
 </body>
 </html>

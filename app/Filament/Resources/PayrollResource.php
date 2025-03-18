@@ -169,7 +169,7 @@ class PayrollResource extends Resource
                             ->default(function ($get) {
 
                                 // Busca a última folha de pagamento existente
-                                $lastPayroll = \App\Models\Payroll::latest('name')->first();
+                                $lastPayroll = \App\Models\Payroll::latest('date')->first();
 
                                 // Se houver uma folha de pagamento anterior, pegar os valores de pagamento dos usuários
                                 $previousPayments = $lastPayroll

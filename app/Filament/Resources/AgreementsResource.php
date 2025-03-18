@@ -100,6 +100,7 @@ class AgreementsResource extends Resource
                     ->label('Foto'),
                 Tables\Columns\TextColumn::make('name')
                     ->label('Nome')
+                    ->sortable()
                     ->searchable(),
                 Tables\Columns\TextColumn::make('description')
                     ->label('Descrição')

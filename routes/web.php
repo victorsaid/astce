@@ -31,6 +31,8 @@ Route::get('/pdf/users/', [\App\Http\Controllers\PdfController::class, 'pdfUsers
     ->name('pdf.users');
 Route::get('/pdf/user/{user}', [\App\Http\Controllers\PdfController::class, 'memberDeclaration'])
     ->name('pdf.memberDeclaration');
+Route::get('/pdf/user/dependants/{user}', [\App\Http\Controllers\PdfController::class, 'memberDependantsDeclaration'])
+    ->name('pdf.memberDependantsDeclaration');
 
 Route::get('/pdf/agreement/{agreement}', [\App\Http\Controllers\PdfController::class, 'beneficiariesAgreement'])
     ->name('pdf.beneficiariesAgreement');

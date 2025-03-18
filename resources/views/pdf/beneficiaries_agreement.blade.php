@@ -32,6 +32,17 @@
             text-align: center;
             margin-bottom: 20px;
         }
+        .footer {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background-color: #f4f4f4;
+            text-align: center;
+            font-size: 12px;
+            padding: 10px;
+            border-top: 1px solid #ccc;
+        }
     </style>
 </head>
 <body>
@@ -67,5 +78,9 @@
     @endforeach
     </tbody>
 </table>
+<div class="footer">
+    <p style="margin-bottom: 2px"><strong>Associação dos Servidores do Tribunal de Contas do Estado do Maranhão - ASTCE/MA</strong></p>
+    <p style="margin-top: 2px">Av. Carlos Cunha, s/nº - Jaracaty, São Luís - MA. CEP: 65.076-820 | Tel: (98) 2016-6055 | CNPJ: 05.092.067/0001-17 | Whatsapp: (98) 98271-0176</p>
+</div>
 </body>
 </html>

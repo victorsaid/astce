@@ -67,8 +67,8 @@
         <p style="text-align: justify">
             Declaramos, para os devidos fins, que o(a) associado(a) <strong>{{ $user->name }}</strong>,
             portador(a) do CPF <strong>{{ $user->document }}</strong> e matrícula <strong>{{ $user->associate->enrollment }}</strong>,
-            é membro regular da <strong>ASTCE - Associação dos Servidores do Tribunal de Contas do Estado do Maranhão</strong>
-            e encontra-se em dia com suas obrigações estatutárias e gozando de plenos direitos.
+            é membro regular da <strong>ASTCE - Associação dos Servidores do Tribunal de Contas do Estado do Maranhão</strong>, tendo como seus dependentes: {{$dependants}},
+            encontra-se em dia com suas obrigações estatutárias e gozando de plenos direitos.
         </p>
     </div>
 
@@ -80,7 +80,7 @@
                 <p style="margin-bottom: 2px;"><strong>{{$employee->name}}</strong></p>
                 <p style="margin-top: 2px;">
                     @if($employee->hasRole('Super_admin'))
-                        <strong>Administrador</strong>
+                        Administrador
                     @else
                         {{$employee->employee->position}}
                     @endif
