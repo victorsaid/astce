@@ -19,14 +19,14 @@ class ViewEmployee extends ViewRecord
                 ->icon('fas-user-edit'),
 
             Actions\ActionGroup::make([
-                Actions\Action::make('Exportar PDF')
-                    ->label('Exportar PDF')
-                    ->icon('fas-file-pdf')
-                    ->color('danger')
-                    ->requiresConfirmation()
-                    ->action(function () {
-                        return redirect()->route('pdf.employees');
-                    }),
+//                Actions\Action::make('Exportar PDF')
+//                    ->label('Exportar PDF')
+//                    ->icon('fas-file-pdf')
+//                    ->color('danger')
+//                    ->requiresConfirmation()
+//                    ->action(function () {
+//                        return redirect()->route('pdf.employees');
+//                    }),
 //                Actions\Action::make('Declaração de Funcionário')
 //                    ->label('Declaração de Funcionário')
 //                    ->icon('fas-file-pdf')

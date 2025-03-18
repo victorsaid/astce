@@ -456,7 +456,7 @@ class UserResource extends Resource
                                     ]),
                             ])
                         ]),
-                    ])->startOnStep(5)->skippable(), //fecha wizard
+                    ])->startOnStep(1)->skippable(), //fecha wizard
 
                 ]),  //fecha grid
             ]); //fecha schema do form
