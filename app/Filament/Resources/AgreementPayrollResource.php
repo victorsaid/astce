@@ -3,7 +3,7 @@
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\AgreementPaymentResource\Pages;
-use App\Models\AgreementPayment;
+use App\Models\AgreementPayroll;
 use App\Models\Agreements;
 use App\Models\User;
 use Filament\Forms;
@@ -14,12 +14,11 @@ use Filament\Forms\Components\TextInput;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Columns\TextColumn;
-use Filament\Tables\Columns\BadgeColumn;
 use Filament\Tables\Grouping\Group;
 use Filament\Forms\Form;
-class AgreementPaymentResource extends Resource
+class AgreementPayrollResource extends Resource
 {
-    protected static ?string $model = AgreementPayment::class;
+    protected static ?string $model = AgreementPayroll::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
 
@@ -27,38 +26,77 @@ class AgreementPaymentResource extends Resource
     {
         return $form
             ->schema([
+                TextInput::make('name')
+                    ->label('Nome')
+                    ->required()
+                    ->columnSpan(4)
+                    ->maxLength(255),
                 Select::make('agreement_id')
                     ->label('Convênio')
                     ->options(Agreements::pluck('name', 'id'))
                     ->searchable()
                     ->required()
-                    ->columnSpan(6),
+                    ->reactive()
+                    ->columnSpan(3)
+                    ->afterStateUpdated(function (Forms\Set $set, Forms\Get $get, $state) {
+                        if (!$state) {
+                            $set('payments', []);
+                            return;
+                        }
 
-                DatePicker::make('payment_date')
+                        $lastAgreementPayroll = AgreementPayroll::where('agreement_id', $state)
+                            ->latest('date')
+                            ->first();
+
+                        $previousPayments = $lastAgreementPayroll
+                            ? $lastAgreementPayroll->payments->pluck('amount', 'user_id')->toArray()
+                            : [];
+
+                        $payments = User::whereHas('associate', fn ($q) => $q->where('is_active', true))
+                            ->orderBy('name')
+                            ->get()
+                            ->map(fn ($user) => [
+                                'user_id' => $user->id,
+                                'enrollment' => $user->associate->enrollment ?? 'N/A',
+                                'amount' => $previousPayments[$user->id] ?? 0,
+                            ])
+                            ->toArray();
+
+                        $set('payments', $payments);
+                    }),
+                DatePicker::make('date')
                     ->label('Data de Referência')
                     ->required()
-                    ->columnSpan(6),
-
+                    ->columnSpan(3),
                 Forms\Components\Placeholder::make('total')
                     ->label('Total da Folha')
-                    ->content(function (Forms\Get $get) {
+                    ->content(function (Forms\Get $get, Forms\Set $set) {
                         $total = 0;
                         foreach ($get('payments') ?? [] as $i => $item) {
-                            $total += floatval($item['value'] ?? 0);
+                            $total += floatval($item['amount'] ?? 0);
                         }
+                        $set('total', $total);
                         return 'R$ ' . number_format($total, 2, ',', '.');
                     })
-                    ->columnSpan(4)
+                    ->columnSpan(2)
                     ->live(),
 
                 Forms\Components\Hidden::make('total'),
 
                 Forms\Components\Fieldset::make('Pagamentos dos Usuários')
+                    ->columnSpan(12)
+                    ->extraAttributes([
+                        'style' => 'max-height: 700px; overflow-y: auto;', // Limita a altura e ativa scroll interno
+                    ])
                     ->schema([
                         Repeater::make('payments')
-                            ->columns(12)
                             ->label('Pagamentos')
                             ->hiddenLabel()
+                            ->relationship('payments')
+                            ->reactive()
+                            ->columnSpan(12)
+                            ->columns(12)
+                            ->debounce('5000')
                             ->schema([
                                 Select::make('user_id')
                                     ->label('Usuário')
@@ -68,30 +106,35 @@ class AgreementPaymentResource extends Resource
                                     )
                                     ->disableOptionsWhenSelectedInSiblingRepeaterItems()
                                     ->required()
+                                    ->hiddenLabel()
                                     ->columnSpan(6),
 
-                                TextInput::make('value')
+                                TextInput::make('amount')
                                     ->label('Valor')
                                     ->prefix('R$')
                                     ->numeric()
+                                    ->hiddenLabel()
                                     ->required()
-                                    ->columnSpan(3),
+                                    ->columnSpan(2),
                             ])
                             ->default(function () {
+                                $lastAgreementPayroll = AgreementPayroll::latest('date')->first();
+                                //dd($lastAgreementPayroll);
+                                $previousPayments = $lastAgreementPayroll
+                                    ? $lastAgreementPayroll->payments->pluck('amount', 'user_id')->toArray()
+                                    : [];
                                 return User::whereHas('associate', fn ($q) => $q->where('is_active', true))
                                     ->orderBy('name')
                                     ->get()
                                     ->map(fn ($user) => [
                                         'user_id' => $user->id,
-                                        'value' => 0,
-                                        'status' => 'pending',
+                                        'enrollment' => $user->associate->enrollment ?? 'N/A',
+                                        'amount' => $previousPayments[$user->id] ?? 0, // Mantém os valores anteriores sem sobrescrever
                                     ])
                                     ->toArray();
                             })
-                            ->minItems(1)
                             ->addActionLabel('Adicionar novo pagamento'),
-                    ])
-                    ->columnSpan(12),
+                    ]),
             ])->columns(12);
     }
 
@@ -99,31 +142,41 @@ class AgreementPaymentResource extends Resource
     public static function table(Tables\Table $table): Tables\Table
     {
         return $table
+            ->defaultGroup('agreement.name')
             ->groups([
                 Group::make('agreement.name') // Agrupar por Convênio
                 ->label('Convênio'),
             ])
             ->columns([
+                TextColumn::make('name')
+                ->label('Nome')
+                ->searchable()
+                ->sortable(),
                 TextColumn::make('agreement.name')
                     ->label('Convênio')
                     ->sortable()
                     ->searchable(),
 
-                TextColumn::make('user.name')
-                    ->label('Usuário')
-                    ->sortable()
-                    ->searchable(),
-
-                TextColumn::make('value')
-                    ->label('Valor Pago')
+                TextColumn::make('total')
+                    ->label('Total')
+                    ->badge()
+                    ->color('success')
                     ->prefix('R$')
                     ->sortable(),
 
-                TextColumn::make('payment_date')
+                TextColumn::make('date')
                     ->label('Data do Pagamento')
+                    ->date('d/m/Y')
                     ->date(),
             ])
-            ->defaultSort('payment_date', 'desc');
+            ->actions([
+                Tables\Actions\EditAction::make(),
+                Tables\Actions\DeleteAction::make()->requiresConfirmation(),
+                Tables\Actions\ViewAction::make(),
+
+
+            ])
+            ->defaultSort('date', 'desc');
     }
 
     public static function getRelations(): array

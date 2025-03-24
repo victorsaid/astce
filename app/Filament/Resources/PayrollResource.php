@@ -44,14 +44,17 @@ class PayrollResource extends Resource
                 TextInput::make('name')
                     ->label('Nome')
                     ->required()
-                    ->columnSpan(6)
+                    ->columnSpan(4)
                     ->maxLength(255),
                 DatePicker::make('date')
                     ->label('Data')
                     ->columnSpan(2)
                     ->required()
                     ->date(),
-
+                TextInput::make('rubrica')
+                    ->label('Rubrica')
+                    ->columnSpan(2)
+                    ->maxLength(20),
                 Forms\Components\Placeholder::make('total')
                     ->label('Total')
                     ->columnSpan(4)

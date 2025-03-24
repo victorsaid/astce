@@ -11,12 +11,12 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('agreement_payments', function (Blueprint $table) {
+        Schema::create('agreement_payrolls', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('user_id')->constrained()->onDelete('cascade');
+            $table->string('name');
             $table->foreignId('agreement_id')->constrained()->onDelete('cascade');
-            $table->decimal('value', 10, 2); // Valor do pagamento
-            $table->date('payment_date'); // Data do pagamento
+            $table->date('date'); // Mês referente ao pagamento
+            $table->decimal('total', 10, 2)->default(0); // Total do mês
             $table->timestamps();
         });
     }
@@ -26,6 +26,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('agreement_payments');
+        Schema::dropIfExists('agreement_payrolls');
     }
 };

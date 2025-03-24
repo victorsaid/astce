@@ -5,24 +5,23 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class AgreementPayment extends Model
+class AgreementPayroll extends Model
 {
     use HasFactory;
 
     protected $fillable = [
-        'user_id',
+        'name',
         'agreement_id',
-        'value',
-        'payment_date',
+        'total',
+        'date',
+        'value'
     ];
-
-    public function user()
-    {
-        return $this->belongsTo(User::class);
-    }
 
     public function agreement()
     {
         return $this->belongsTo(Agreements::class);
+    }
+    public function payments() {
+        return $this->hasMany(AgreementPayrollPayment::class);
     }
 }

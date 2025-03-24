@@ -9,7 +9,7 @@ class Payroll extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['date', 'total', 'name'];
+    protected $fillable = ['date', 'total', 'name', 'rubrica'];
 
     protected $casts = [
         'date' => 'date:d-m-Y',

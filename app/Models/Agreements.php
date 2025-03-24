@@ -32,6 +32,6 @@ class Agreements extends Model
 
     public function payments()
     {
-        return $this->hasMany(\App\Models\AgreementPayment::class);
+        return $this->hasMany(\App\Models\AgreementPayroll::class);
     }
 }
