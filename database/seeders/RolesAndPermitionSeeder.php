@@ -86,6 +86,16 @@ class RolesAndPermitionSeeder extends Seeder
                 'payroll_read', 'payroll_create', 'payroll_update', 'payroll_delete'
         );
 
+        $role = Role::create(['name' => 'Comission_member', 'guard_name' => 'web']);
+        $role->givePermissionTo('access_panel',
+                'user_read', 'user_create', 'user_update', 'user_delete',
+                'employee_read', 'employee_create', 'employee_update', 'employee_delete',
+                'associate_read', 'associate_create', 'associate_update', 'associate_delete',
+                'meeting_read', 'meeting_create', 'meeting_update', 'meeting_delete',
+                'agreement_read', 'agreement_create', 'agreement_update', 'agreement_delete',
+                'payroll_read', 'payroll_create', 'payroll_update', 'payroll_delete'
+        );
+
 
         // role Associate
         $role = Role::create(['name' => 'Associate', 'guard_name' => 'web']);

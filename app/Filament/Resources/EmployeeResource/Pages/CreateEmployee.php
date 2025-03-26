@@ -32,7 +32,7 @@ class CreateEmployee extends CreateRecord
         // Verificar se o CPF já existe no banco de dados
         $existingUser = \App\Models\User::where('document', $data['document'])->first();
 
-        if ($existingUser) {
+        if($existingUser) {
             // Atualizar os dados básicos do usuário existente, mas não alterar a senha
             $existingUser->update([
                 'name' => $data['name'] ?? $existingUser->name,
@@ -62,8 +62,10 @@ class CreateEmployee extends CreateRecord
                 ->success()
                 ->send();
 
-            // Retornar o registro existente para impedir a criação de um novo
-            $existingUser->assignRole($data['role'] ?? 'Employee');
+            if($data['commission_member'] == true){
+                $existingUser->assignRole($data['role'] ?? 'Employee');
+            }
+
             return $existingUser;
         }
 
@@ -87,6 +89,15 @@ class CreateEmployee extends CreateRecord
 
         // Criar um novo registro se o CPF não existir
         return parent::handleRecordCreation($data);
+    }
+
+    protected function afterCreate(): void
+    {
+        $employee = $this->record;
+        dd($employee->employee->commission_member);
+        if($employee->employee->commission_member == 1){
+            $employee->assignRole($data['role'] ?? 'Comission_member');
+        }
     }
 
     protected function getRedirectUrl(): string

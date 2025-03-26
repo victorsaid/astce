@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Associados</title>
+    <title>Pagamentos de Convênio</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -51,9 +51,10 @@
          style="width: 150px; height: auto;"
          alt="Logo">
 </div>
-<h1>Folha de pagamento</h1>
-<p style="margin-top: 2px; margin-bottom: 2px; font-size: 14px"><strong>Nome da Folha: </strong>{{$payroll->name}}</p>
-<p style="margin-top: 2px; margin-bottom: 2px; font-size: 14px"><strong>Data da folha: </strong>{{ \Carbon\Carbon::parse($payroll->date)->format('d/m/Y') }}</p>
+<h1>Pagamento de Convênio</h1>
+<p style="margin-bottom: 2px; margin-top: 2px; font-size: 14px;" ><strong>Convênio: </strong>{{$payroll->agreement->name}}</p>
+<p style="margin-bottom: 2px; margin-top: 2px; font-size: 14px;"><strong> Nome da folha: </strong>{{$payroll->name}}</p>
+<p style="margin-bottom: 2px; margin-top: 2px; font-size: 14px;"><strong>Data da folha: </strong>{{ \Carbon\Carbon::parse($payroll->date)->format('d/m/Y') }}</p>
 <p>Emitido em {{ \Carbon\Carbon::now()->format('d/m/Y H:i') }}</p>
 <table>
     <thead>

@@ -26,6 +26,8 @@ class MeetingResource extends Resource
     protected static ?string $modelLabel = 'Assembléia';
     protected static ?string $pluralModelLabel = 'Assembléias';
     protected static ?string $navigationGroup = 'Assembléias';
+    protected static ?int $navigationSort = 5
+    ;
 
     protected static ?string $slug = 'assembleias';
 

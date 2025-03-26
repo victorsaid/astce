@@ -35,7 +35,7 @@ class PayrollResource extends Resource
     protected static ?string $navigationLabel = 'Folha de Pagamento';
     protected static ?string $pluralModelLabel = 'Folhas de Pagamento';
 
-    protected static ?string $navigationIcon = 'heroicon-o-banknotes';
+    protected static ?string $navigationIcon = 'fas-piggy-bank';
 
     public static function form(Form $form): Form
     {
@@ -70,7 +70,7 @@ class PayrollResource extends Resource
                         $set('total', $total);
                         return Number::currency($total, 'BRL');
                     })
-                    ->live(), // Garante que o valor seja atualizado dinamicamente
+                    ->live(true), // Garante que o valor seja atualizado dinamicamente
                 Forms\Components\Hidden::make('total')
                     ->label('Total'),
 
@@ -167,7 +167,7 @@ class PayrollResource extends Resource
                                     ->columnSpan(2)
                                     ->required()
                                     ->reactive()
-                                    ->live(debounce: 1500),
+                                    ->live(true),
                             ])
                             ->default(function ($get) {
 

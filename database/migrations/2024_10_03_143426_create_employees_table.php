@@ -17,7 +17,8 @@ return new class extends Migration
             $table->date('hire_date');
             $table->decimal('salary', 10, 2);
             $table->string('position');
-            $table->boolean('is_active')->default(true);
+            $table->boolean('is_active');
+            $table->boolean('commission_member')->nullable();
 
 
             $table->timestamps();

@@ -33,6 +33,7 @@ class EmployeeResource extends Resource
     protected static ?string $navigationGroup = 'Usuários';
     protected static ?string $modelLabel = 'Funcionários';
     protected static ?string $pluralModelLabel = 'Funcionários';
+    protected static ?int $navigationSort = 1;
 
     protected static ?string $navigationIcon = 'fas-user-cog';
 
@@ -324,19 +325,9 @@ class EmployeeResource extends Resource
                                         ->maxLength(255)
                                         //->dehydrateStateUsing(fn($state) => filled($state) ? bcrypt($state) : null) // Criptografa a senha somente se fornecida
                                         ->required(false) // Torna o campo não obrigatório
-                                        ->dehydrated(true), // Sempre envia o valor do campo, mesmo vazio
-
-
+                                        ->dehydrated(true),
                                     Hidden::make('role')
-                                        ->label('Perfil')
-//                                        ->relationship('roles', 'name',
-//                                            fn(Builder $query) => auth()->user()->hasRole(['Admin', 'Super_admin']) ? null :
-//                                                $query->whereNotIn('name', ['Admin', 'Super_admin'])
-//                                        )
-                                    //->required()
-                                    //->preload()
-                                    //->multiple()
-                                    ,
+                                        ->label('Perfil'),
                                 ]),
                             ]), //fecha step 4
                         Wizard\Step::make('Funcionário') //passo 5
@@ -360,6 +351,22 @@ class EmployeeResource extends Resource
                                         ->required()
                                         ->maxLength(255),
 
+                                    Forms\Components\ToggleButtons::make('commission_member')
+                                        ->label('Membro da Comissão?')
+                                        ->default(true)
+                                        ->inline()
+                                        ->options([
+                                            0 => 'Não',
+                                            1 => 'Sim',
+                                        ])
+                                        ->icons([
+                                            0 => 'heroicon-o-x-mark',
+                                            1 => 'heroicon-o-check',
+                                        ])
+                                        ->colors([
+                                            0 => 'danger',
+                                            1 => 'success',
+                                        ]),
                                     Forms\Components\ToggleButtons::make('is_active')
                                         ->label('Funcionário Ativo?')
                                         ->default(true)
@@ -375,8 +382,7 @@ class EmployeeResource extends Resource
                                         ->colors([
                                             '0' => 'danger',
                                             '1' => 'success',
-                                        ])
-                                    ,
+                                        ]),
 
                                 ]),
                         ]),

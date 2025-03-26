@@ -20,7 +20,13 @@ class AgreementPayrollResource extends Resource
 {
     protected static ?string $model = AgreementPayroll::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static ?string $modelLabel = 'Pagamento de Convênio';
+    protected static ?string $navigationLabel = 'Pagamentos de Convênios';
+    protected static ?string $pluralModelLabel = 'Pagamentos de Convênios';
+    protected static ?string $navigationGroup = 'Convênios';
+    protected static ?int $navigationSort = 2;
+
+    protected static ?string $navigationIcon = 'heroicon-o-banknotes';
 
     public static function form(Form $form): Form
     {
@@ -79,7 +85,7 @@ class AgreementPayrollResource extends Resource
                         return 'R$ ' . number_format($total, 2, ',', '.');
                     })
                     ->columnSpan(2)
-                    ->live(),
+                    ->live(true),
 
                 Forms\Components\Hidden::make('total'),
 
@@ -92,11 +98,12 @@ class AgreementPayrollResource extends Resource
                         Repeater::make('payments')
                             ->label('Pagamentos')
                             ->hiddenLabel()
-                            ->relationship('payments')
                             ->reactive()
+                            ->live(true)
+                            ->relationship('payments')
                             ->columnSpan(12)
                             ->columns(12)
-                            ->debounce('5000')
+
                             ->schema([
                                 Select::make('user_id')
                                     ->label('Usuário')
@@ -166,8 +173,8 @@ class AgreementPayrollResource extends Resource
 
                 TextColumn::make('date')
                     ->label('Data do Pagamento')
-                    ->date('d/m/Y')
-                    ->date(),
+                    ->sortable()
+                    ->date('d/m/Y'),
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),
@@ -189,10 +196,10 @@ class AgreementPayrollResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListAgreementPayments::route('/'),
-            'create' => Pages\CreateAgreementPayment::route('/create'),
-            'view' => Pages\ViewAgreementPayment::route('/{record}'),
-            'edit' => Pages\EditAgreementPayment::route('/{record}/edit'),
+            'index' => AgreementPayrollResource\Pages\ListAgreementPayroll::route('/'),
+            'create' => AgreementPayrollResource\Pages\CreateAgreementPayroll::route('/create'),
+            'view' => AgreementPayrollResource\Pages\ViewAgreementPayroll::route('/{record}'),
+            'edit' => AgreementPayrollResource\Pages\EditAgreementPayroll::route('/{record}/edit'),
         ];
     }
 }

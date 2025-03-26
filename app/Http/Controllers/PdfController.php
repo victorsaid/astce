@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\AgreementPayroll;
 use App\Models\Agreements;
 use App\Models\Meeting;
 use App\Models\Payroll;
@@ -12,6 +13,7 @@ use Illuminate\Support\Facades\Auth;
 
 class PdfController extends Controller
 {
+    // EXPORTA TODAS AS REUNIÕES
     public function pdfMeetings(User $user)
     {
         $meetings = Meeting::all();
@@ -22,6 +24,7 @@ class PdfController extends Controller
         return $pdf->download('example.pdf');
     }
 
+    // EXPORTA UMA REUNIÃO
     public function exportMeetingPdf(Meeting $meeting)
     {
         // Carrega os tópicos relacionados
@@ -34,6 +37,8 @@ class PdfController extends Controller
         return $pdf->stream("reuniao_{$meeting->id}.pdf");
     }
 
+
+    // EXPORTA OS USUARIOS
     public function pdfUsers(Request $request)
     {
         $orderBy = $request->get('order_by', 'name'); // Ordenação padrão
@@ -47,7 +52,7 @@ class PdfController extends Controller
 
         return $pdf->stream('pdf_users.pdf');
     }
-
+    //FUNÇÃO AUXULIAR
     private function getUsersQuery(bool $onlyActive, string $orderBy)
     {
         $query = User::query()
@@ -67,6 +72,8 @@ class PdfController extends Controller
         }
         return $query;
     }
+
+    //EXPORTA DECLARAÇÃO DE ASSOCIADO
     public function memberDeclaration(User $user)
     {
         //dd($user);
@@ -78,6 +85,7 @@ class PdfController extends Controller
 
         return $pdf->stream('member_declaration.blade.php');
     }
+    // EXPORTA A DECLARAÇÃO DE ASSOCIADO COM NOME DE DEPENDENTE
     public function memberDependantsDeclaration(User $user, Request $request)
     {
         //dd($request);
@@ -93,6 +101,7 @@ class PdfController extends Controller
         return $pdf->stream('member_declaration.blade.php');
     }
 
+    //EXPORTA OS ASSOCIADO DE UM CONVÊNIO
     public function beneficiariesAgreement(Agreements $agreement)
     {
         $agreement->load('users');
@@ -103,6 +112,7 @@ class PdfController extends Controller
         return $pdf->stream('beneficiaries_agreement.blade.php');
     }
 
+    // EXPORTA UMA FOLHA DE PAGAMENTO DOS ASSOCIADOS
     public function payrollExport(Payroll $payroll, Request $request)
     {
         $payroll->load('payments.user.associate'); // Carrega os relacionamentos corretamente
@@ -123,6 +133,31 @@ class PdfController extends Controller
 
         $pdf->set_option('isRemoteEnabled', true);
         return $pdf->stream('pdf_payrollExport.pdf');
+
+    }
+
+    // EXPORTA UMA FOLHA DE PAGAMENTO DE UM CONVÊNIO
+    public function payrollAgreementExport(AgreementPayroll $payroll, Request $request)
+    {
+        $payroll->load('payments.user.associate'); // Carrega os relacionamentos corretamente
+
+
+        // Obtém o critério de ordenação da requisição
+        $orderBy = $request->query('order_by', 'name');
+
+        // Aplica a ordenação
+        $sortedPayments = $payroll->payments->sortBy(fn($payment) =>
+        $orderBy === 'enrollment' ? $payment->user->associate->enrollment : $payment->user->name
+        );
+
+        // Gera o PDF com os pagamentos ordenados
+        $pdf = Pdf::loadView('pdf.pdf_payrollAgreementExport', [
+            'payroll' => $payroll,
+            'payments' => $sortedPayments,
+        ]);
+
+        $pdf->set_option('isRemoteEnabled', true);
+        return $pdf->stream('pdf_payrollAgreementExport.pdf');
 
     }
 }

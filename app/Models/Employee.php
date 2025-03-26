@@ -16,6 +16,8 @@ class Employee extends Model
         'hire_date',
         'salary',
         'position',
+        'is_active',
+        'commission_member'
     ];
 
     public function user()

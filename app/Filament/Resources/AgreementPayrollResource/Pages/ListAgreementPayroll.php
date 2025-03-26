@@ -1,19 +1,19 @@
 <?php
 
-namespace App\Filament\Resources\AgreementPaymentResource\Pages;
+namespace App\Filament\Resources\AgreementPayrollResource\Pages;
 
 use App\Filament\Resources\AgreementPayrollResource;
 use Filament\Actions;
-use Filament\Resources\Pages\ViewRecord;
+use Filament\Resources\Pages\ListRecords;
 
-class ViewAgreementPayment extends ViewRecord
+class ListAgreementPayroll extends ListRecords
 {
     protected static string $resource = AgreementPayrollResource::class;
 
     protected function getHeaderActions(): array
     {
         return [
-            Actions\EditAction::make(),
+            Actions\CreateAction::make(),
         ];
     }
 }

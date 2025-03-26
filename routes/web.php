@@ -39,3 +39,6 @@ Route::get('/pdf/agreement/{agreement}', [\App\Http\Controllers\PdfController::c
 
 Route::get('/pdf/payroll/{payroll}', [\App\Http\Controllers\PdfController::class, 'payrollExport'])
     ->name('pdf.payrollExport');
+
+Route::get('/pdf/payroll/agreement/{payroll}', [\App\Http\Controllers\PdfController::class, 'payrollAgreementExport'])
+    ->name('pdf.payrollAgreementExport');
