@@ -21,9 +21,9 @@ class CreateEmployee extends CreateRecord
         }else{
             $data['password'] = bcrypt($data['password']);
         }
-        if (!isset($data['role'])) {
-            $data['role'] = 'Employee';
-        }
+//        if(!isset($data['role'])) {
+//            $data['role'] = 'Employee';
+//        }
         return $data;
     }
 
@@ -45,26 +45,12 @@ class CreateEmployee extends CreateRecord
                 'photo' => $data['photo'] ?? $existingUser->photo,
 
             ]);
-
-            // Atualizar ou criar informações de associado
-//            if (isset($data['associate'])) {
-//                $existingUser->associate()->updateOrCreate([], $data['associate']);
-//            }
-
-//            if (isset($data['associate'])) {
-//                $existingUser->associate()->updateOrCreate([], $data['associate']);
-//            }
-
             // Notificar o usuário que o registro foi atualizado
             \Filament\Notifications\Notification::make()
                 ->title('Usuário atualizado com sucesso!')
                 ->body('O CPF já está vinculado a um associado. Informações de associado foram atualizadas.')
                 ->success()
                 ->send();
-
-            if($data['commission_member'] == true){
-                $existingUser->assignRole($data['role'] ?? 'Employee');
-            }
 
             return $existingUser;
         }
@@ -76,7 +62,6 @@ class CreateEmployee extends CreateRecord
             }
 
             $newUser = \App\Models\User::create($data);
-            $newUser->assignRole($data['role'] ?? 'Employee');
 
             \Filament\Notifications\Notification::make()
                 ->title('Usuário criado com sucesso!')
@@ -94,7 +79,10 @@ class CreateEmployee extends CreateRecord
     protected function afterCreate(): void
     {
         $employee = $this->record;
-        dd($employee->employee->commission_member);
+        //dd($employee->employee->commission_member);
+        if($employee->employee->is_active == 1){
+            $employee->assignRole($data['role'] ?? 'Employee');
+        }
         if($employee->employee->commission_member == 1){
             $employee->assignRole($data['role'] ?? 'Comission_member');
         }

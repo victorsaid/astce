@@ -69,17 +69,14 @@ class EmployeeResource extends Resource
 
                                                 // 🔍 Obtém o ID do registro sendo editado (se houver)
                                                 $recordId = $get('id'); // Obtém o ID no contexto do Filament
-
                                                 // 🚨 Se estamos editando, não aplicamos a validação
                                                 if (!empty($recordId)) {
                                                     return;
                                                 }
-
                                                 // 🚨 Apenas faz a validação se estivermos na criação
                                                 $isAssociate = User::where('document', $cpfSanitizado)
                                                     ->whereHas('employee')
                                                     ->exists();
-
                                                 if ($isAssociate) {
                                                     $fail('Este CPF já está sendo usado por um funcionario.');
                                                 }
@@ -383,7 +380,6 @@ class EmployeeResource extends Resource
                                             '0' => 'danger',
                                             '1' => 'success',
                                         ]),
-
                                 ]),
                         ]),
                     ])->skippable(), //fecha wizard
@@ -476,7 +472,7 @@ class EmployeeResource extends Resource
                                 ->danger()
                                 ->send();
                         }elseif($record->employee){
-                            $record->associate->delete();
+                            $record->employee->delete();
                             $record->removeRole('Employee');
                             return Notification::make()
                                 ->title('Funcionário excluído com sucesso!')

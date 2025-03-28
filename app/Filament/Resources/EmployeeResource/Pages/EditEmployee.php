@@ -25,7 +25,6 @@ class EditEmployee extends EditRecord
             // Remova a formatação do CPF
             $data['document'] = str_replace(['.', '-'], '', $data['document']);
 
-
             // Atualize os dados do registro
             $updateData = [
                 'name' => $data['name'] ?? $record->name,
@@ -43,7 +42,18 @@ class EditEmployee extends EditRecord
 
                 $updateData['password'] = bcrypt($data['password']);
             }
-
+            // Remove ou atribui Role de membro de comissão
+            if($record->employee->commission_member == 0){
+                $record->removeRole('Comission_member');
+            }else{
+                $record->assignRole('Comission_member');
+            }
+            // Remove ou atribui Role de membro de comissão
+            if($record->employee->is_active == 0){
+                $record->removeRole('Employee');
+            }else{
+                $record->assignRole('Employee');
+            }
             $record->update($updateData);
 
             // Atualizar ou criar informações relacionadas
