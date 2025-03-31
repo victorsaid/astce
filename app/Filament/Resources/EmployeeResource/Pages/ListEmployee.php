@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Filament\Resources\FuncTesteResource\Pages;
+namespace App\Filament\Resources\EmployeeResource\Pages;
 
 use App\Filament\Resources\EmployeeResource;
 use Filament\Actions;

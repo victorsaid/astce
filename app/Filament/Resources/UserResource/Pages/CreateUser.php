@@ -23,10 +23,10 @@ class CreateUser extends CreateRecord
         }else{
             $data['password'] = bcrypt($data['password']);
         }
-        if (!isset($data['role'])) {
-
-            $data['role'] = 'Associate';
-        }
+//        if (!isset($data['role'])) {
+//
+//            $data['role'] = 'Associate';
+//        }
         return $data;
     }
 
@@ -49,15 +49,6 @@ class CreateUser extends CreateRecord
 
             ]);
 
-            // Atualizar ou criar informações de associado
-//            if (isset($data['associate'])) {
-//                $existingUser->associate()->updateOrCreate([], $data['associate']);
-//            }
-
-//            if (isset($data['employee'])) {
-//                $existingUser->employee()->updateOrCreate([], $data['employee']);
-//            }
-
             // Notificar o usuário que o registro foi atualizado
             \Filament\Notifications\Notification::make()
                 ->title('Usuário atualizado com sucesso!')
@@ -65,7 +56,7 @@ class CreateUser extends CreateRecord
                 ->success()
                 ->send();
 
-            $existingUser->assignRole($data['role'] ?? 'Associate');
+            //$existingUser->assignRole($data['role'] ?? 'Associate');
             // Retornar o registro existente para impedir a criação de um novo
             return $existingUser;
         }
@@ -90,6 +81,16 @@ class CreateUser extends CreateRecord
 
         // Criar um novo registro se o CPF não existir
         return parent::handleRecordCreation($data);
+    }
+
+    protected function afterCreate(): void
+    {
+        $associate = $this->record;
+        //dd($employee->employee->commission_member);
+        if($associate->associate->is_active == 1){
+            $associate->assignRole($data['role'] ?? 'Associate');
+        }
+
     }
 
     protected function getRedirectUrl(): string

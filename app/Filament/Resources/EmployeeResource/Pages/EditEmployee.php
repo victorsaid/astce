@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Filament\Resources\FuncTesteResource\Pages;
+namespace App\Filament\Resources\EmployeeResource\Pages;
 
 use App\Filament\Resources\EmployeeResource;
 use App\Filament\Resources\UserResource;
@@ -44,9 +44,9 @@ class EditEmployee extends EditRecord
             }
             // Remove ou atribui Role de membro de comissão
             if($record->employee->commission_member == 0){
-                $record->removeRole('Comission_member');
+                $record->removeRole('Commission_member');
             }else{
-                $record->assignRole('Comission_member');
+                $record->assignRole('Commission_member');
             }
             // Remove ou atribui Role de membro de comissão
             if($record->employee->is_active == 0){

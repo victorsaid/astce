@@ -36,13 +36,18 @@ class EditUser extends EditRecord
                 //dd($data['password']);
                 $updateData['password'] = bcrypt($data['password']);
             }
+            if($record->associate->is_active == 0){
+                $record->removeRole('Associate');
+            }else{
+                $record->assignRole('Associate');
+            }
 
             $record->update($updateData);
 
             // Atualizar ou criar informações relacionadas
-            if (isset($data['employee'])) {
-                $record->employee()->updateOrCreate([], $data['employee']);
-            }
+//            if (isset($data['employee'])) {
+//                $record->employee()->updateOrCreate([], $data['employee']);
+//            }
 
             // Notificar o usuário
             \Filament\Notifications\Notification::make()

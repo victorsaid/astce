@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Filament\Resources\FuncTesteResource\Pages;
+namespace App\Filament\Resources\EmployeeResource\Pages;
 
 use App\Filament\Resources\EmployeeResource;
 use Filament\Actions;
@@ -84,7 +84,7 @@ class CreateEmployee extends CreateRecord
             $employee->assignRole($data['role'] ?? 'Employee');
         }
         if($employee->employee->commission_member == 1){
-            $employee->assignRole($data['role'] ?? 'Comission_member');
+            $employee->assignRole($data['role'] ?? 'Commission_member');
         }
     }
 
