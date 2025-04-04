@@ -508,10 +508,10 @@ class EmployeeResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListEmployee::route('/'),
-            'create' => Pages\CreateEmployee::route('/create'),
-            'edit' => Pages\EditEmployee::route('/{record}/edit'),
-            'view' => Pages\ViewEmployee::route('/{record}'),
+            'index' => EmployeeResource\Pages\ListEmployee::route('/'),
+            'create' => EmployeeResource\Pages\CreateEmployee::route('/create'),
+            'edit' => EmployeeResource\Pages\EditEmployee::route('/{record}/edit'),
+            'view' => EmployeeResource\Pages\ViewEmployee::route('/{record}'),
         ];
     }
 
