@@ -31,9 +31,9 @@ use Laravel\Prompts\SearchPrompt;
 class PayrollResource extends Resource
 {
     protected static ?string $model = Payroll::class;
-    protected static ?string $modelLabel = 'Folha de Pagamento';
-    protected static ?string $navigationLabel = 'Folha de Pagamento';
-    protected static ?string $pluralModelLabel = 'Folhas de Pagamento';
+    protected static ?string $modelLabel = 'Pagamento';
+    protected static ?string $navigationLabel = 'Pagamentos';
+    protected static ?string $pluralModelLabel = 'Pagamentos';
 
     protected static ?string $navigationIcon = 'fas-piggy-bank';
 
@@ -81,45 +81,6 @@ class PayrollResource extends Resource
                         'style' => 'max-height: 700px; overflow-y: auto;', // Limita a altura e ativa scroll interno
                     ])
                     ->schema([
-//                        TextInput::make('search')
-//                            ->label('Pesquisar Pagamento')
-//                            ->placeholder('Digite o nome do associado ou valor')
-//                            ->extraAttributes(['style' => 'margin-bottom: 20px;'])
-//                            ->columnSpan(12)
-//                            ->reactive()
-//                            ->live()
-//                            ->debounce(1500)
-//                            ->prefixIcon('heroicon-o-magnifying-glass')
-//                            ->afterStateUpdated(function ($state, callable $set, callable $get) {
-//                                // Recupera os pagamentos originais
-//                                $originalPayments = $get('originalPayments') ?? $get('payments');
-//
-//                                if (!$originalPayments) {
-//                                    return;
-//                                }
-//
-//                                // Se a pesquisa estiver vazia, exibe todos os pagamentos sem alterar valores
-//                                if (empty($state)) {
-//                                    $set('filteredPayments', []);
-//                                    return;
-//                                }
-//
-//                                // Filtragem dos pagamentos sem modificar `payments`
-//                                $filteredPayments = collect($originalPayments)->filter(function ($payment) use ($state) {
-//                                    $user = User::find($payment['user_id']);
-//                                    return str_contains(strtolower($payment['associated_type'] ?? ''), strtolower($state)) ||
-//                                        str_contains(strtolower($payment['amount'] ?? ''), strtolower($state)) ||
-//                                        ($user && str_contains(strtolower($user->name ?? ''), strtolower($state)));
-//                                })->pluck('user_id')->toArray();
-//
-//                                // Apenas armazena os IDs dos registros filtrados, sem alterar `payments`
-//                                $set('filteredPayments', $filteredPayments);
-//
-//                                // Armazena os pagamentos originais se ainda não tiver sido feito
-//                                if (!$get('originalPayments')) {
-//                                    $set('originalPayments', $originalPayments);
-//                                }
-//                            }),
                         Repeater::make('payments')
                             ->columnSpan(12)
                             ->columns(12)
@@ -152,9 +113,6 @@ class PayrollResource extends Resource
                                     ->label('Matricula')
                                     ->disabled()
                                     ->prefix('Matricula:')
-                                    ->afterStateUpdated(fn ($state, callable $set) =>
-                                    $set('enrollment', User::find($state)?->associate->enrollment ?? 'N/A')
-                                    )
                                     ->reactive()
                                     ->hiddenLabel() // O campo será preenchido automaticamente
                                     ->columnSpan(2), // Ocupa apenas uma coluna
